@@ -12,7 +12,7 @@ export type PublicTransaction = Omit<Transaction, 'signedTransactionBytes' | 're
 };
 
 // Convert a Transaction object to a PublicTransaction object
-export const transactionToPublicTransaction = (transaction: Transaction): PublicTransaction => {
+const transactionToPublicTransaction = (transaction: Transaction): PublicTransaction => {
   return {
     ...transaction,
     currentStatus: transaction.currentStatus as TransactionStatus,
