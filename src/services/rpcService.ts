@@ -8,32 +8,50 @@ import {
   import { BN } from '@coral-xyz/anchor';
   import { validatePublicKey } from '@/utils/publicKey';
   
-  const DEFAULT_DEVNET_RPC_ENDPOINT = 'https://api.devnet.solana.com';
-  const DEFAULT_MAINNET_RPC_ENDPOINT = 'https://api.mainnet-beta.solana.com';
+  // Define constants for network types
+  export const DEVNET = 'devnet' as const;
+  export const MAINNET = 'mainnet' as const;
+  export type Network = typeof DEVNET | typeof MAINNET;
   
   /**
-   * RpcService: A class for interacting with the Solana RPC
-   * It provides methods to get the connection to the Solana RPC, airdrop SOL, get SOL and SPL balances,
+   * Get the network from environment variables
+   * @returns {Network} The network type (DEVNET or MAINNET)
+   */
+  export const getNetworkFromEnv = (): Network => {
+    const network = process.env.NEXT_PUBLIC_NETWORK as Network;
+    if (![DEVNET, MAINNET].includes(network)) {
+      console.warn(`Invalid network value provided: ${network}. Defaulting to ${DEVNET}.`);
+      return DEVNET;
+    }
+    return network;
+  }
+  
+  /**
+   * RpcService: A class for interacting with the Helius API for Solana blockchain operations
+   * It provides methods to get the connection to the Helius RPC, airdrop SOL, get SOL and SPL balances,
    * get transaction history, and perform various token operations like transfer, compress, and decompress.
    */
   export class RpcService {
     public connection: Connection;
+    public network: string;
   
-    constructor(api_key: string, endpoint: string = DEFAULT_DEVNET_RPC_ENDPOINT) {
-      this.connection = this.getConnection(api_key, endpoint);
+    constructor(api_key: string, network: string = DEVNET) {
+      this.connection = this.getConnection(api_key, network);
+      this.network = network;
     }
   
     /**
-     * Get a connection to the Solana RPC
-     * @param {string} api_key - The Solana RPC API key
-     * @param {string} endpoint - The endpoint to connect to (default: DEVNET_RPC_ENDPOINT)
-     * @returns {Connection} A connection to the Solana RPC
+     * Get a connection to the Helius API
+     * @param {string} api_key - The Helius API key
+     * @param {string} network - The network to connect to (default: DEVNET)
+     * @returns {Connection} A connection to the Helius API
      */
-    getConnection(api_key: string, endpoint: string = DEFAULT_DEVNET_RPC_ENDPOINT): Connection {
+    getConnection(api_key: string, network: string = DEVNET): Connection {
       if (!api_key) {
-        api_key = process.env.NEXT_PUBLIC_SOLANA_RPC_API_KEY || '';
+        api_key = process.env.NEXT_PUBLIC_HELIUS_API_KEY || '';
       }
-      const RPC_ENDPOINT = `${endpoint}/${api_key}`;
+      // Note: you can replace helius with any other RPC provider as desired
+      const RPC_ENDPOINT = `https://${network}.helius-rpc.com?api-key=${api_key}`;
       const connection = new Connection(RPC_ENDPOINT);
       console.log("Debug: connection to", RPC_ENDPOINT, "created");
       return connection;
