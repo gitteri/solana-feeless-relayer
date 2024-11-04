@@ -8,8 +8,8 @@ import {
   import { BN } from '@coral-xyz/anchor';
   import { validatePublicKey } from '@/utils/publicKey';
   
-  const DEVNET_RPC_ENDPOINT = 'https://api.devnet.solana.com';
-  const MAINNET_RPC_ENDPOINT = 'https://api.mainnet-beta.solana.com';
+  const DEFAULT_DEVNET_RPC_ENDPOINT = 'https://api.devnet.solana.com';
+  const DEFAULT_MAINNET_RPC_ENDPOINT = 'https://api.mainnet-beta.solana.com';
   
   /**
    * RpcService: A class for interacting with the Solana RPC
@@ -19,7 +19,7 @@ import {
   export class RpcService {
     public connection: Connection;
   
-    constructor(api_key: string, endpoint: string = DEVNET_RPC_ENDPOINT) {
+    constructor(api_key: string, endpoint: string = DEFAULT_DEVNET_RPC_ENDPOINT) {
       this.connection = this.getConnection(api_key, endpoint);
     }
   
@@ -29,7 +29,7 @@ import {
      * @param {string} endpoint - The endpoint to connect to (default: DEVNET_RPC_ENDPOINT)
      * @returns {Connection} A connection to the Solana RPC
      */
-    getConnection(api_key: string, endpoint: string = DEVNET_RPC_ENDPOINT): Connection {
+    getConnection(api_key: string, endpoint: string = DEFAULT_DEVNET_RPC_ENDPOINT): Connection {
       if (!api_key) {
         api_key = process.env.NEXT_PUBLIC_SOLANA_RPC_API_KEY || '';
       }
