@@ -14,20 +14,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - name: Install npm
+        uses: npm/setup-build-tool@v4
+        with:
+          build_tool: npm
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
+          node-version: 20
+          cache: 'npm'
 
       - name: Install dependencies
-        run: pnpm install
+        run: npm install --frozen-lockfile
 
       - name: Build project
-        run: pnpm run build
+        run: npm run build
 
       - name: Test project
-        run: pnpm test
+        run: npm run test
