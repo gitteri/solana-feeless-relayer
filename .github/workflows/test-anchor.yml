@@ -13,11 +13,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install npm
-        uses: npm/setup-build-tool@v4
-        with:
-          build_tool: npm
-
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
@@ -25,7 +20,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install --frozen-lockfile
+        run: npm ci
 
       - uses: metadaoproject/setup-anchor@v2
         with:
