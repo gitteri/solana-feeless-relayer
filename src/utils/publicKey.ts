@@ -7,3 +7,12 @@ export const validatePublicKey = (publicKey: PublicKey): boolean => {
   }
   return true
 }
+
+export const validatePublicKeyString = (publicKey: string): boolean => {
+  try {
+    new PublicKey(publicKey);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}

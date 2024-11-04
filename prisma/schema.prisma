@@ -14,19 +14,20 @@ datasource db {
 }
 
 model Transaction {
-  id            String              @id @default(cuid())
-  referenceId   String
-  requestedByIp String
-  amount        String
-  mint          String
-  mintSymbol    String
-  destination   String
-  sender        String
-  feeInLamports String
-  feeInSpl      String
-  rawTx         String
-  statuses      TransactionStatus[]
-  createdAt     DateTime            @default(now())
+  id                       String              @id @default(cuid())
+  referenceId              String?
+  requestedByIp            String?
+  amount                   String
+  mint                     String
+  mintSymbol               String
+  destination              String
+  sender                   String
+  feeInLamports            String
+  feeInSpl                 String
+  unsignedTransactionBytes String
+  signedTransactionBytes   String?
+  statuses                 TransactionStatus[]
+  createdAt                DateTime            @default(now())
 }
 
 model TransactionStatus {
