@@ -16,7 +16,7 @@ const validateCreateTransactionRequest = (req: NextApiRequest): { error: string 
     return { error: 'Request URL is required' };
   }
   const requestUrl = new URL(req.url);
-  // const { referenceId, amount, mintSymbol, destination, sender }: ActionPostRequest = req.body;
+
   const { account }: ActionPostRequest = req.body;
   if (!validatePublicKeyString(account)) {
     return { error: 'Invalid sender public key' };
@@ -117,6 +117,7 @@ export async function POST(req: NextApiRequest, res: NextApiResponse<ActionPostR
   let signedTransactionBytes: string | null = null;
   try {
     const unsignedTransactionBytes = await createSplTransfer(sender, destination, amount, mintSymbol);
+
     // TODO: sign the transaction
     // const signedTransactionBytes = await signTransaction(unsignedTransactionBytes);
     signedTransactionBytes = unsignedTransactionBytes;
