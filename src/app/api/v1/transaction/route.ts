@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { validatePublicKeyString } from '@/utils/publicKey';
 import { validate, v4 as uuidv4 } from 'uuid';
-import { createTransaction, getTransaction } from '@/logic/transactionLogic';
+import { createTransaction, getTransaction } from '@/logic/transactionEngine';
 import { Transaction, TransactionStatus, transactionStatuses } from '@/app/types/transaction';
 import { supportedMints } from '@/app/config/mint';
 
@@ -52,7 +52,7 @@ const convertCreateTransactionRequestToTransaction = (req: CreateTransactionRequ
     id,
     referenceId,
     amount,
-    mint,
+    mint: mint.address,
     mintSymbol,
     destination,
     sender,

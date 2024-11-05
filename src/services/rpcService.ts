@@ -1,12 +1,16 @@
 import {
     Connection,
     PublicKey,
+    Transaction,
+    ComputeBudgetProgram,
   } from '@solana/web3.js';
   import {
+    createTransferCheckedInstruction,
     TOKEN_PROGRAM_ID,
   } from '@solana/spl-token';
   import { BN } from '@coral-xyz/anchor';
   import { validatePublicKey } from '@/utils/publicKey';
+import { supportedMints } from '@/app/config/mint';
   
   const DEFAULT_DEVNET_RPC_ENDPOINT = 'https://api.devnet.solana.com';
   const DEFAULT_MAINNET_RPC_ENDPOINT = 'https://api.mainnet-beta.solana.com';
@@ -19,7 +23,7 @@ import {
   export class RpcService {
     public connection: Connection;
   
-    constructor(api_key: string, endpoint: string = DEFAULT_DEVNET_RPC_ENDPOINT) {
+    constructor(api_key: string = process.env.NEXT_PUBLIC_SOLANA_RPC_API_KEY || '', endpoint: string = DEFAULT_DEVNET_RPC_ENDPOINT) {
       this.connection = this.getConnection(api_key, endpoint);
     }
   
@@ -30,9 +34,6 @@ import {
      * @returns {Connection} A connection to the Solana RPC
      */
     getConnection(api_key: string, endpoint: string = DEFAULT_DEVNET_RPC_ENDPOINT): Connection {
-      if (!api_key) {
-        api_key = process.env.NEXT_PUBLIC_SOLANA_RPC_API_KEY || '';
-      }
       const RPC_ENDPOINT = `${endpoint}/${api_key}`;
       const connection = new Connection(RPC_ENDPOINT);
       console.log("Debug: connection to", RPC_ENDPOINT, "created");
@@ -129,6 +130,78 @@ import {
         console.error("Error fetching SPL balance:", error);
         throw error;
       }
+    }
+
+    /**
+     * Get the highest recent priority fee
+     * @returns {Promise<number>} The highest recent priority fee in microLamports
+     */
+    async getHighestRecentPriorityFee(): Promise<number> {
+      try {
+        const recentFees = await this.connection.getRecentPrioritizationFees();
+        if (recentFees.length === 0) {
+          throw new Error('No recent prioritization fees found');
+        }
+        const highestFee = Math.max(...recentFees.map(fee => fee.prioritizationFee));
+        return highestFee;
+      } catch (error) {
+        console.error("Error fetching recent prioritization fees:", error);
+        throw error;
+      }
+    }
+
+    /**
+     * Estimate the fee for a transaction
+     * @param {string} mintSymbol - The mint symbol to estimate the fee for
+     * @returns {Promise<string>} The fee in lamports
+     */
+    async estimateFeeInLamports(mintSymbol: string): Promise<string> {
+      const rpcService = new RpcService();
+
+      const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+        units: 200_000,
+      });
+
+      const highestRecentPriorityFee = await this.getHighestRecentPriorityFee();
+      console.debug("Debug: Highest recent priority fee is", highestRecentPriorityFee, "microLamports");
+       
+      const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: highestRecentPriorityFee,
+      });
+       
+    
+      // Create a dummy SPL token transfer transaction to estimate the fee
+      const fromTokenAccount = new PublicKey('11111111111111111111111111111111'); // Dummy public key
+      const toTokenAccount = new PublicKey('11111111111111111111111111111111'); // Dummy public key
+      const mint = supportedMints[mintSymbol as keyof typeof supportedMints];
+    
+      const transaction = new Transaction().add(
+        modifyComputeUnits,
+        addPriorityFee,
+        createTransferCheckedInstruction(
+          fromTokenAccount,
+          new PublicKey(mint.address),
+          toTokenAccount,
+          new PublicKey('11111111111111111111111111111111'), // Dummy owner public key
+          1, // Minimal amount for transfer
+          mint.decimals,
+          undefined,
+          TOKEN_PROGRAM_ID, // TODO: support token 2022
+        )
+      );
+      transaction.feePayer = new PublicKey('11111111111111111111111111111111'); // Dummy fee payer public key
+    
+      const { blockhash } = await rpcService.connection.getLatestBlockhash();
+      transaction.recentBlockhash = blockhash;
+      const fee = await rpcService.connection.getFeeForMessage(transaction.compileMessage(), 'confirmed');
+      console.debug("Debug: estimated fee for a basic SPL transfer is", fee, "lamports");
+    
+      if (fee === null) {
+        throw new Error('Failed to get fee for the transaction');
+      }
+
+    
+      return fee.toString();
     }
   }
   
