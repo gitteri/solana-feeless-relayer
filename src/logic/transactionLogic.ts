@@ -17,7 +17,7 @@ export async function createSplTransfer(sender: string, destination: string, amo
     sender,
     destination,
     amount,
-    mint: mint,
+    mint: mint.address,
     mintSymbol,
     unsignedTransactionBytes: '',
     currentStatus: transactionStatuses.INIT,
