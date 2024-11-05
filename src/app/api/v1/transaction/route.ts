@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { validatePublicKeyString } from '@/utils/publicKey';
 import { validate, v4 as uuidv4 } from 'uuid';
-import { createTransaction, getTransaction } from '@/logic/transactionLogic';
-import { Transaction, TransactionStatus, transactionStatuses } from '@/app/types/transaction';
 import { supportedMints } from '@/app/config/mint';
+import { Transaction, TransactionStatus, transactionStatuses } from '@/app/types/transaction';
+import { createTransaction, getTransaction } from '@/logic/transactionLogic';
+import { validatePublicKeyString } from '@/utils/publicKey';
 
 // This type is used to return the transaction to the client.
 // It is used to hide certain fields from the public.
@@ -20,7 +20,7 @@ const transactionToPublicTransaction = (transaction: Transaction): PublicTransac
 };
 
 // Validate the request body for creating a new transaction
-const validateCreateTransactionRequest = (req: CreateTransactionRequest): { error: string } | null => {
+const validateCreateTransactionRequest = (req: NextApiRequest): { error: string } | null => {
   const { referenceId, amount, mintSymbol, destination, sender } = req.body;
   if (!validatePublicKeyString(destination)) {
     return { error: 'Invalid destination public key' };
@@ -44,7 +44,7 @@ const validateCreateTransactionRequest = (req: CreateTransactionRequest): { erro
 }
 
 // Convert the request body to a Transaction object
-const convertCreateTransactionRequestToTransaction = (req: CreateTransactionRequest): Transaction => {
+const convertCreateTransactionRequestToTransaction = (req: NextApiRequest): Transaction => {
   const { referenceId, amount, mintSymbol, destination, sender } = req.body;
   const mint = supportedMints[mintSymbol as keyof typeof supportedMints];
   const id = uuidv4();
@@ -62,31 +62,12 @@ const convertCreateTransactionRequestToTransaction = (req: CreateTransactionRequ
   };
 }
 
-
-interface GetTransactionRequest extends NextApiRequest {
-  query: {
-    id: string;
-  };
-}
-
-interface CreateTransactionRequest extends NextApiRequest {
-  body: {
-    referenceId?: string;
-    amount: string;
-    mintSymbol: string;
-    destination: string;
-    sender: string;
-  };
-}
-
-interface TransactionResponse extends NextApiResponse {
-  json: (body: PublicTransaction | { error: string }) => void;
-}
-
-const validateGetTransactionRequest = (req: GetTransactionRequest): { error: string } | null => {
-  const { id } = req.query;
+const validateGetTransactionRequest = (id?: any): { error: string } | null => {
   if (!id) {
     return { error: 'Transaction ID is required' };
+  }
+  if (typeof id !== 'string') {
+    return { error: 'Transaction ID must be a string' };
   }
   if (!validate(id)) {
     return { error: 'Invalid Transaction ID format' };
@@ -95,12 +76,14 @@ const validateGetTransactionRequest = (req: GetTransactionRequest): { error: str
 }
 
 // Handle GET requests to retrieve a transaction by ID
-export async function GET(req: GetTransactionRequest, res: TransactionResponse) {
-  const validationError = validateGetTransactionRequest(req);
+export async function GET(req: NextApiRequest, res: NextApiResponse<PublicTransaction | { error: string }>) {
+  const { id } = req.query;
+  const validationError = validateGetTransactionRequest(id);
   if (validationError) {
     return res.status(400).json(validationError);
   }
-  const transaction = await getTransaction(req.query.id);
+
+  const transaction = await getTransaction(id as string);
   if (!transaction) {
     return res.status(404).json({ error: 'Transaction not found' });
   }
@@ -108,14 +91,18 @@ export async function GET(req: GetTransactionRequest, res: TransactionResponse) 
 };
 
 // Handle POST requests to create a new transaction
-export async function POST(req: CreateTransactionRequest, res: TransactionResponse) {
+export async function POST(req: NextApiRequest, res: NextApiResponse<PublicTransaction | { error: string }>) {
   const validationError = validateCreateTransactionRequest(req);
   if (validationError) {
     return res.status(400).json(validationError);
   }
 
   const transaction = convertCreateTransactionRequestToTransaction(req);
-  const newTransaction = await createTransaction(transaction);
 
-  return res.status(201).json(newTransaction);
+  const newTransaction = await createTransaction(transaction);
+  if (!newTransaction) {
+    return res.status(500).json({ error: 'Failed to create transaction' });
+  }
+
+  return res.status(201).json(transactionToPublicTransaction(newTransaction));
 };
