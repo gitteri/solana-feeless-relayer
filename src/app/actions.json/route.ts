@@ -3,13 +3,6 @@ import { createActionHeaders, type ActionsJson } from "@solana/actions";
 export const GET = async () => {
   const payload: ActionsJson = {
     rules: [
-    // I don't think we need this:
-    //   // map all root level routes to an action
-    //   {
-    //     pathPattern: "/*",
-    //     apiPath: "/api/v1/actions/*",
-    //   },
-    //   // idempotent rule as the fallback
       {
         pathPattern: "/api/v1/actions/**",
         apiPath: "/api/v1/actions/**",
