@@ -10,8 +10,8 @@ import { validatePublicKeyString } from '@/utils/publicKey';
 // create the standard headers for this route (including CORS)
 const headers = createActionHeaders();
 
-// Validate the request body for creating a new transaction
-const validateCreateTransactionRequest = async (req: NextRequest): Promise<{ error: string } | { sender: string, destination: string, amount: string, mintSymbol: string }> => {
+// Validate the request body for creating a new SPL transfer
+const validateCreateSplTransferRequest = async (req: NextRequest): Promise<{ error: string } | { sender: string, destination: string, amount: string, mintSymbol: string }> => {
   if (!req.url) {
     return { error: 'Request URL is required' };
   }
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse 
   const payload: ActionGetResponse = {
     type: "action",
     title: "Token Transfer Without SOL",
-    icon: new URL("/solana_devs.jpg", requestUrl.origin).toString(),
+    icon: new URL("/logo.jpeg", requestUrl.origin).toString(),
     description: "Transfer a token to another Solana wallet without needing SOL in your wallet",
     label: "Transfer", // this value will be ignored since `links.actions` exists
     links: {
@@ -108,7 +108,7 @@ export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse 
 
 // Handle POST requests to create a new transaction
 export async function POST(req: NextRequest, res: NextResponse<ActionPostResponse | { error: string }>) {
-  const validationResult = await validateCreateTransactionRequest(req);
+  const validationResult = await validateCreateSplTransferRequest(req);
   if ('error' in validationResult) {
     return NextResponse.json({ error: validationResult.error }, { status: 400 });
   }
