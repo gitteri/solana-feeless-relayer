@@ -13,7 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Transaction {
+model SplTransfer {
   id                       String              @id @default(cuid())
   referenceId              String?
   requestedByIp            String?
@@ -32,8 +32,8 @@ model Transaction {
 
 model TransactionStatus {
   id            Int         @id @default(autoincrement())
-  transaction   Transaction @relation(fields: [transactionId], references: [id])
-  transactionId String
+  splTransfer   SplTransfer @relation(fields: [splTransferId], references: [id])
+  splTransferId String
   status        String
   createdAt     DateTime    @default(now())
 }

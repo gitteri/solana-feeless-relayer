@@ -1,5 +1,5 @@
 
-export type Transaction = {
+export type SplTransfer = {
   id: string;
   referenceId?: string;
   requestedByIp?: string;

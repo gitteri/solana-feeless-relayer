@@ -1,17 +1,17 @@
-import { Transaction, TransactionStatus } from '@/app/types/transaction';
+import { SplTransfer, TransactionStatus } from '@/app/types/splTransfer';
 import { prisma } from '../index';
 
 // This is a collection of functions that are used to interact with the transactions table in the database.
 // This will likely be updated as the project evolves.
 
 // Function to get all transactions
-export const getAllTransactions = async () => {
-    return await prisma.transaction.findMany();
+export const getAllSplTransfers = async () => {
+    return await prisma.splTransfer.findMany();
 };
 
 // Function to get a transaction by ID
-export const getTransactionById = async (id: string): Promise<Transaction | null> => {
-    const dbTransaction = await prisma.transaction.findUnique({
+export const getSplTransferById = async (id: string): Promise<SplTransfer | null> => {
+    const dbTransaction = await prisma.splTransfer.findUnique({
         where: { id },
         include: {
             statuses: {
@@ -38,7 +38,7 @@ export const getTransactionById = async (id: string): Promise<Transaction | null
 };
 
 // Function to create a new transaction
-export const createTransaction = async (data: Transaction) => {
+export const createSplTransfer = async (data: SplTransfer) => {
     if (!data.unsignedTransactionBytes) {
         throw new Error('unsignedTransactionBytes is required');
     }
@@ -49,7 +49,7 @@ export const createTransaction = async (data: Transaction) => {
         throw new Error('feeInSpl is required');
     }
     
-    await prisma.transaction.create({
+    await prisma.splTransfer.create({
         data: {
             id: data.id,
             referenceId: data.referenceId,
