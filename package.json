@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.26.0",
+    "@solana/actions": "^1.6.5",
     "@types/bn.js": "^5.1.0",
     "@types/jest": "^29.0.3",
     "@types/node": "^20",
