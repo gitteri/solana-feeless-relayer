@@ -1,6 +1,6 @@
 'use server';
 
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import { ActionGetResponse, ActionPostRequest, ActionPostResponse, createActionHeaders } from '@solana/actions';
 import { supportedMints } from '@/app/config/mint';
 import { createSplTransfer } from '@/logic/transactionLogic';
@@ -11,13 +11,13 @@ import { validatePublicKeyString } from '@/utils/publicKey';
 const headers = createActionHeaders();
 
 // Validate the request body for creating a new transaction
-const validateCreateTransactionRequest = (req: NextApiRequest): { error: string } | { sender: string, destination: string, amount: string, mintSymbol: string } => {
+const validateCreateTransactionRequest = async (req: NextRequest): Promise<{ error: string } | { sender: string, destination: string, amount: string, mintSymbol: string }> => {
   if (!req.url) {
     return { error: 'Request URL is required' };
   }
   const requestUrl = new URL(req.url);
 
-  const { account }: ActionPostRequest = req.body;
+  const { account }: ActionPostRequest = await req.json();
   if (!validatePublicKeyString(account)) {
     return { error: 'Invalid sender public key' };
   }
@@ -43,9 +43,9 @@ const validateCreateTransactionRequest = (req: NextApiRequest): { error: string 
 }
 
 // Handle GET requests to retrieve a transaction by ID
-export async function GET(req: NextApiRequest, res: NextApiResponse<ActionGetResponse | { error: string }>) {
+export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse | { error: string }>) {
   if (!req.url) {
-    return res.status(400).json({ error: 'Request URL is required' });
+    return NextResponse.json({ error: 'Request URL is required' }, { status: 400 });
   }
 
   const requestUrl = new URL(req.url);
@@ -103,14 +103,14 @@ export async function GET(req: NextApiRequest, res: NextApiResponse<ActionGetRes
     },
   };
 
-  return res.status(200).setHeaders(new Headers(headers)).json(payload);
+  return NextResponse.json(payload, { headers });
 };
 
 // Handle POST requests to create a new transaction
-export async function POST(req: NextApiRequest, res: NextApiResponse<ActionPostResponse | { error: string }>) {
-  const validationResult = validateCreateTransactionRequest(req);
+export async function POST(req: NextRequest, res: NextResponse<ActionPostResponse | { error: string }>) {
+  const validationResult = await validateCreateTransactionRequest(req);
   if ('error' in validationResult) {
-    return res.status(400).json({ error: validationResult.error });
+    return NextResponse.json({ error: validationResult.error }, { status: 400 });
   }
 
   const { sender, destination, amount, mintSymbol } = validationResult;
@@ -122,15 +122,15 @@ export async function POST(req: NextApiRequest, res: NextApiResponse<ActionPostR
     // const signedTransactionBytes = await signTransaction(unsignedTransactionBytes);
     signedTransactionBytes = unsignedTransactionBytes;
   } catch (error) {
-    return res.status(500).json({ error: 'Failed to create transaction' });
+    return NextResponse.json({ error: 'Failed to create transaction' }, { status: 500 });
   }
   if (!signedTransactionBytes) {
-    return res.status(500).json({ error: 'Failed to create transaction' });
+    return NextResponse.json({ error: 'Failed to create transaction' }, { status: 500 });
   }
 
-  return res.status(200).setHeaders(new Headers(headers)).json({
+  return NextResponse.json({
     type: 'transaction',
     transaction: signedTransactionBytes,
-  })
+  }, { headers });
 };
 

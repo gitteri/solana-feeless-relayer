@@ -1,4 +1,6 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+'use server';
+
+import { NextRequest, NextResponse } from 'next/server';
 import { validate } from 'uuid';
 import { SplTransfer, TransactionStatus } from '@/app/types/splTransfer';
 import { getSplTransfer } from '@/logic/transactionLogic';
@@ -31,18 +33,19 @@ const validateGetSplTransferRequest = (id?: any): { error: string } | null => {
 }
 
 // Handle GET requests to retrieve a transaction by ID
-export async function GET(req: NextApiRequest, res: NextApiResponse<PublicSplTransfer | { error: string }>) {
-  const { id } = req.query;
+// To generate new transactions, use the actions/transfer endpoint.
+export async function GET(req: NextRequest, res: NextResponse<PublicSplTransfer | { error: string }>) {
+  const requestUrl = new URL(req.url);
+  const id = requestUrl.searchParams.get('id');
+
   const validationError = validateGetSplTransferRequest(id);
   if (validationError) {
-    return res.status(400).json(validationError);
+    return NextResponse.json(validationError, { status: 400 });
   }
 
   const splTransfer = await getSplTransfer(id as string);
   if (!splTransfer) {
-    return res.status(404).json({ error: 'Transaction not found' });
+    return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
   }
-  return res.status(200).json(splTransferToPublicSplTransfer(splTransfer));
+  return NextResponse.json(splTransferToPublicSplTransfer(splTransfer), { status: 200 });
 };
-
-// To generate new transactions, use the actions/transfer endpoint.
