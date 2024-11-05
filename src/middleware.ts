@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import EmbeddedWallet from '@/utils/EmbeddedWallet'
+import { EmbeddedWallet } from '@/utils/EmbeddedWallet'
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
     // Only process requests to /api/*

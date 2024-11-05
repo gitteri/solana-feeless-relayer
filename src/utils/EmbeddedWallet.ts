@@ -1,6 +1,7 @@
-import {core, KeystoreType} from 'tinywallet';
+import {core, KeystoreType, } from 'tinywallet';
+export {ix_Transfer, ix_TransferSPL} from 'tinywallet/dist/instructionbuilder';
 
-class EmbeddedWallet {
+export class EmbeddedWallet {
 
     private static walletCore: core | null = null;
 
@@ -14,5 +15,3 @@ class EmbeddedWallet {
         return this.walletCore!;
     }
 }
-
-export default EmbeddedWallet;

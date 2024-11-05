@@ -114,23 +114,21 @@ export async function POST(req: NextRequest, res: NextResponse<ActionPostRespons
   }
 
   const { sender, destination, amount, mintSymbol } = validationResult;
-  let signedTransactionBytes: string | null = null;
+
   try {
-    const unsignedTransactionBytes = await createSplTransfer(sender, destination, amount, mintSymbol);
+    const signedTransactionBytes = await createSplTransfer(sender, destination, amount, mintSymbol);
 
-    // TODO: sign the transaction
-    // const signedTransactionBytes = await signTransaction(unsignedTransactionBytes);
-    signedTransactionBytes = unsignedTransactionBytes;
+    return NextResponse.json({
+        type: 'transaction',
+        transaction: signedTransactionBytes!,
+      }, { headers });
+
+
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create transaction' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ 
+      error: `Failed to create transaction: ${errorMessage}` 
+    }, { status: 500 });
   }
-  if (!signedTransactionBytes) {
-    return NextResponse.json({ error: 'Failed to create transaction' }, { status: 500 });
-  }
-
-  return NextResponse.json({
-    type: 'transaction',
-    transaction: signedTransactionBytes,
-  }, { headers });
 };
 
