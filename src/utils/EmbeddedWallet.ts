@@ -2,18 +2,16 @@ import {core, KeystoreType} from 'tinywallet';
 
 class EmbeddedWallet {
 
-    private static wallet: core;
+    private static walletCore: core | null = null;
 
-    private static async initialize(): Promise<void> {
-        this.wallet = await core.CreateAsync(KeystoreType.Local);
+    static async initialize(): Promise<void> {
+        if (!this.walletCore) {
+            this.walletCore = await core.CreateAsync(KeystoreType.Local);
+        }
     }
 
     static get(): core {
-
-        if (!this.wallet) {
-            this.initialize();
-        }
-        return this.wallet;
+        return this.walletCore!;
     }
 }
 
