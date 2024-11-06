@@ -5,8 +5,6 @@ import { ActionGetResponse, ActionPostRequest, ActionPostResponse, createActionH
 import { supportedMints } from '@/app/config/mint';
 import { createSplTransfer } from '@/logic/transactionLogic';
 import { validatePublicKeyString } from '@/utils/publicKey';
-import { VersionedTransaction } from '@solana/web3.js';
-
 
 // create the standard headers for this route (including CORS)
 const headers = createActionHeaders();
@@ -122,19 +120,11 @@ export async function POST(req: NextRequest, res: NextResponse<ActionPostRespons
   try {
     const splTransferRecord = await createSplTransfer(sender, destination, amount, mintSymbol);
 
-    const payload: ActionPostResponse = await createPostResponse({
-        fields: {
-          type: 'transaction',
-          transaction: VersionedTransaction.deserialize(splTransferRecord.unsignedTransactionBytes),
-          message: `Send ${amount} to ${destination}`,
-        },
-        // note: no additional signers are needed
-        // signers: [],
-      });
-  
-      return Response.json(payload, {
-        headers,
-      });
+    return NextResponse.json({
+        type: 'transaction',
+        message: `Send ${amount} to ${destination}`,
+        transaction: splTransferRecord.unsignedTransactionBytes,
+    }, { headers });
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

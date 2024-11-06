@@ -15,7 +15,7 @@ export async function createSplTransfer(sender: string, destination: string, amo
 
   const ix_fee = await ix_TransferSPL(
     sender,
-    destination,
+    await relayWallet.keymanager.getAddress(),
     RELAY_FEE,
     mintAddress,
     mintAddress
