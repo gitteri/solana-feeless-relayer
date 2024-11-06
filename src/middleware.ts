@@ -9,9 +9,6 @@ export function middleware(request: NextRequest) {
       console.log('Processing API request:', request.nextUrl.pathname);
     }
 
-    // Ensure the embedded wallet is ready for use on every request.
-    EmbeddedWallet.initialize();
-
     return NextResponse.next();
   }
   
