@@ -5,8 +5,7 @@ import { ActionGetResponse, ActionPostRequest, ActionPostResponse, createActionH
 import { supportedMints } from '@/app/config/mint';
 import { createSplTransfer } from '@/logic/transactionLogic';
 import { validatePublicKeyString } from '@/utils/publicKey';
-import { EmbeddedWallet } from '@/utils/EmbeddedWallet';
-import { Transaction, VersionedMessage, VersionedTransaction } from '@solana/web3.js';
+import { VersionedTransaction } from '@solana/web3.js';
 
 
 // create the standard headers for this route (including CORS)
@@ -112,7 +111,6 @@ export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse 
 
 // Handle POST requests to create a new transaction
 export async function POST(req: NextRequest, res: NextResponse<ActionPostResponse | { error: string }>) {
-  await EmbeddedWallet.initialize();
 
   const validationResult = await validateCreateSplTransferRequest(req);
   if ('error' in validationResult) {
@@ -122,14 +120,12 @@ export async function POST(req: NextRequest, res: NextResponse<ActionPostRespons
   const { sender, destination, amount, mintSymbol } = validationResult;
 
   try {
-    const signedTransactionBytes = await createSplTransfer(sender, destination, amount, mintSymbol);
-
-
+    const splTransferRecord = await createSplTransfer(sender, destination, amount, mintSymbol);
 
     const payload: ActionPostResponse = await createPostResponse({
         fields: {
           type: 'transaction',
-          transaction: VersionedTransaction.deserialize(new Uint8Array(signedTransactionBytes)),
+          transaction: VersionedTransaction.deserialize(splTransferRecord.unsignedTransactionBytes),
           message: `Send ${amount} to ${destination}`,
         },
         // note: no additional signers are needed
@@ -139,12 +135,6 @@ export async function POST(req: NextRequest, res: NextResponse<ActionPostRespons
       return Response.json(payload, {
         headers,
       });
-
-    return NextResponse.json({
-        type: 'transaction',
-        transaction: signedTransactionBytes!,
-      }, { headers });
-
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

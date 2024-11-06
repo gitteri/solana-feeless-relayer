@@ -7,7 +7,7 @@ export async function getSplTransfer(id: string): Promise<SplTransfer | null> {
   return await getSplTransferById(id);
 }
 
-export async function createSplTransfer(sender: string, destination: string, amount: string, mintSymbol: string): Promise<Buffer> {
+export async function createSplTransfer(sender: string, destination: string, amount: string, mintSymbol: string): Promise<SplTransfer> {
   const mintAddress = supportedMints[mintSymbol as keyof typeof supportedMints];
   const relayWallet = await EmbeddedWallet.get();
 
@@ -49,8 +49,8 @@ export async function createSplTransfer(sender: string, destination: string, amo
     feeInSpl: RELAY_FEE,
   };
 
-  // return serialized unsigned transaction bytes
   await createSplTransferInDb(splTransfer);
 
-  return splTransfer.unsignedTransactionBytes;
+  // return serialized unsigned transaction bytes
+  return splTransfer;
 }
