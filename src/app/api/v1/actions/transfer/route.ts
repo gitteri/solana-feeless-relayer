@@ -1,7 +1,7 @@
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { ActionGetResponse, ActionPostRequest, ActionPostResponse, createActionHeaders, createPostResponse } from '@solana/actions';
+import { ActionGetResponse, ActionPostRequest, ActionPostResponse, createActionHeaders } from '@solana/actions';
 import { supportedMints } from '@/app/config/mint';
 import { createSplTransfer } from '@/logic/transactionLogic';
 import { validatePublicKeyString } from '@/utils/publicKey';
