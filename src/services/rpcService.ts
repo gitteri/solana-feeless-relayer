@@ -6,10 +6,13 @@ import {
 } from '@solana/web3.js';
 import {
   createTransferCheckedInstruction,
+  getAssociatedTokenAddressSync,
   TOKEN_PROGRAM_ID,
+  TokenAccountNotFoundError,
+  TokenInvalidAccountOwnerError,
 } from '@solana/spl-token';
 import { validatePublicKey } from '@/utils/publicKey';
-import { supportedMints } from '@/app/config/mint';
+import { getMintInfo } from '@/app/config/mint';
 
 const DEFAULT_DEVNET_RPC_ENDPOINT = 'https://api.devnet.solana.com';
 const DEFAULT_MAINNET_RPC_ENDPOINT = 'https://api.mainnet-beta.solana.com';
@@ -96,39 +99,26 @@ export class RpcService {
    * @param {PublicKey} publicKey - The public key to check the balance for
    * @param {PublicKey} mint - The SPL token mint
    * @param {PublicKey} programId - The SPL token program ID (default: TOKEN_PROGRAM_ID)
-   * @returns {Promise<bigint>} The SPL token balance as a bigint
+   * @returns {Promise<string>} The SPL token balance as a string
    */
-  async getSplBalance(publicKey: PublicKey, mint: PublicKey, programId = TOKEN_PROGRAM_ID): Promise<bigint> {
+  async getSplBalance(publicKey: PublicKey, mint: PublicKey, programId = TOKEN_PROGRAM_ID): Promise<string> {
+    const ata = getAssociatedTokenAddressSync(publicKey, mint, true, programId);
     try {
-      const pk = new PublicKey(publicKey);
-      if (!validatePublicKey(pk)) {
-        return BigInt(0);
+      const info = await this.connection.getAccountInfo(ata);
+      if (info === null) {
+        return '0';
       }
-
-      console.log("getting spl balance", mint);
-      const response = await this.connection.getTokenAccountsByOwner(
-        pk,
-        {
-          mint: mint,
-          programId: programId
-        }
-      );
-
-      if (response.value.length === 0) {
-        console.log("No token account found for this wallet");
-        return BigInt(0);
+      const tokenAccountBalance = await this.connection.getTokenAccountBalance(ata);
+      const balance = tokenAccountBalance.value.uiAmountString;
+      if (balance === undefined) {
+        return '0';
       }
-
-      // The balance is stored in the last 8 bytes of the account data
-      // The bytes are stored in little-endian format
-      const tokenAccountInfo = response.value[0].account.data;
-      const balance = BigInt('0x' + Buffer.from(tokenAccountInfo.subarray(64, 72)).reverse().toString('hex'));
-
-      console.log("Debug: SPL balance for", pk.toBase58(), "is", balance.toString());
-
       return balance;
     } catch (error) {
-      console.error("Error fetching SPL balance:", error);
+      console.debug("Debug: error fetching SPL balance:", error);
+      if (error instanceof TokenAccountNotFoundError || error instanceof TokenInvalidAccountOwnerError) {
+        return '0';
+      }
       throw error;
     }
   }
@@ -157,6 +147,7 @@ export class RpcService {
    * @returns {Promise<bigint>} The fee in lamports
    */
   async estimateFeeInLamports(mintSymbol: string): Promise<bigint> {
+    const mint = getMintInfo(mintSymbol);
     const rpcService = new RpcService();
 
     const computeUnits = 200_000;
@@ -174,28 +165,24 @@ export class RpcService {
       microLamports: highestRecentPriorityFee,
     });
 
+    const dummyPublicKey = new PublicKey('11111111111111111111111111111111');
 
     // Create a dummy SPL token transfer transaction to estimate the fee
-    const fromTokenAccount = new PublicKey('11111111111111111111111111111111'); // Dummy public key
-    const toTokenAccount = new PublicKey('11111111111111111111111111111111'); // Dummy public key
-
-    const mint = supportedMints[mintSymbol as keyof typeof supportedMints];
-
     const transaction = new Transaction().add(
       modifyComputeUnits,
       addPriorityFee,
       createTransferCheckedInstruction(
-        fromTokenAccount,
+        dummyPublicKey, // fromTokenAccount
         new PublicKey(mint.address),
-        toTokenAccount,
-        new PublicKey('11111111111111111111111111111111'), // Dummy owner public key
+        dummyPublicKey, // toTokenAccount
+        dummyPublicKey, // owner
         1, // Minimal amount for transfer
         mint.decimals,
         undefined,
         TOKEN_PROGRAM_ID, // TODO: support token 2022
       )
     );
-    transaction.feePayer = new PublicKey('11111111111111111111111111111111'); // Dummy fee payer public key
+    transaction.feePayer = dummyPublicKey;
 
     const { blockhash } = await rpcService.connection.getLatestBlockhash();
     transaction.recentBlockhash = blockhash;

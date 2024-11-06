@@ -1,5 +1,5 @@
 import { getFeeForSplTokenTransfer } from '@/logic/fee';
-import { supportedMints } from '@/app/config/mint';
+import { getMintInfo } from '@/app/config/mint';
 import { NextRequest, NextResponse } from 'next/server';
 
 const validateFeeRequest = (req: NextRequest): { error: string } | null => {
@@ -7,7 +7,9 @@ const validateFeeRequest = (req: NextRequest): { error: string } | null => {
   if (!mintSymbol) {
     return { error: 'Mint symbol is required' };
   }
-  if (!(mintSymbol in supportedMints)) {
+  try {
+    getMintInfo(mintSymbol);
+  } catch (error) {
     return { error: 'Unsupported mint symbol' };
   }
   return null;

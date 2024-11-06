@@ -11,12 +11,13 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest ./src",
+    "test": "dotenv -e .env.local -- jest ./src",
     "prisma-deploy": "dotenv -e .env.local -- npx prisma db push"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.30.1",
     "@prisma/client": "5.21.1",
+    "@pythnetwork/price-service-client": "^1.9.0",
     "@solana/spl-token": "^0.4.8",
     "@solana/wallet-adapter-base": "^0.9.23",
     "@solana/wallet-adapter-react": "^0.15.35",

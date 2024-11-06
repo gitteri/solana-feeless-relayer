@@ -1,6 +1,7 @@
 import Decimal from 'decimal.js';
 import { RpcService } from '@/services/rpcService';
-import { supportedMints } from '@/app/config/mint';
+import { getMintInfo } from '@/app/config/mint';
+import { PriceFeed } from '@/services/priceFeed';
 
 const convertLamportsToUSD = async (lamports: bigint): Promise<string> => {
   const lamportsPerSol = new Decimal(1000000000);
@@ -9,14 +10,10 @@ const convertLamportsToUSD = async (lamports: bigint): Promise<string> => {
   // TODO: allow this to work for non-USD currencies
   let solToUsdRate = '';
   try {
-    // TODO: use more than one source for the rate
-    // TODO: use a cache
-    // TODO: retry logic
-    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
-    const data = await response.json();
-    solToUsdRate = data.solana.usd;
+    const priceFeed = new PriceFeed();
+    solToUsdRate = await priceFeed.getSolPrice();
     if (solToUsdRate === undefined || isNaN(Number(solToUsdRate))) {
-      throw new Error('coingecko returned an invalid SOL to USD rate', { cause: solToUsdRate });
+      throw new Error('pyth returned an invalid SOL to USD rate', { cause: solToUsdRate });
     }
   } catch (error) {
     console.error('Error fetching SOL to USD rate:', error);
@@ -28,7 +25,9 @@ const convertLamportsToUSD = async (lamports: bigint): Promise<string> => {
 
 export const getFeeForSplTokenTransfer = async (mintSymbol: string): Promise<string> => {
   // validate the mint symbol
-  if (!(mintSymbol in supportedMints)) {
+  try {
+    getMintInfo(mintSymbol);
+  } catch (error) {
     throw new Error('Unsupported mint symbol');
   }
 

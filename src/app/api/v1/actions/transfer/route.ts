@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { ActionGetResponse, ActionPostRequest, ActionPostResponse, createActionHeaders } from '@solana/actions';
-import { supportedMints } from '@/app/config/mint';
+import { getMintInfo } from '@/app/config/mint';
 import { createSplTransfer } from '@/logic/transactionEngine';
 import { validatePublicKeyString } from '@/utils/publicKey';
 
@@ -29,7 +29,12 @@ const validateCreateSplTransferRequest = async (req: NextRequest): Promise<{ err
     return { error: 'Invalid amount' };
   }
   const mintSymbol = requestUrl.searchParams.get('mintSymbol');
-  if (!mintSymbol || typeof mintSymbol !== 'string' || !(mintSymbol in supportedMints)) {
+  try {
+    if (!mintSymbol) {
+      return { error: 'Mint symbol is required' };
+    }
+    getMintInfo(mintSymbol);
+  } catch (error) {
     return { error: 'Unsupported token' };
   }
 
