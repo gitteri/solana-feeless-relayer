@@ -6,7 +6,6 @@ import { supportedMints } from '@/app/config/mint';
 import { createSplTransfer } from '@/logic/transactionEngine';
 import { validatePublicKeyString } from '@/utils/publicKey';
 
-
 // create the standard headers for this route (including CORS)
 const headers = createActionHeaders();
 
@@ -42,9 +41,11 @@ const validateCreateSplTransferRequest = async (req: NextRequest): Promise<{ err
   };
 }
 
+export const OPTIONS = GET;
+
 // Handle GET requests to retrieve the action for creating a new SPL transfer
-export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse | { error: string }>) {
-  if (!req.url) {
+export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse | { error: string }>) {  
+    if (!req.url) {
     return NextResponse.json({ error: 'Request URL is required' }, { status: 400 });
   }
 
@@ -111,29 +112,28 @@ export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse 
 
 // Handle POST requests to create a new transaction
 export async function POST(req: NextRequest, res: NextResponse<ActionPostResponse | { error: string }>) {
+
   const validationResult = await validateCreateSplTransferRequest(req);
   if ('error' in validationResult) {
     return NextResponse.json({ error: validationResult.error }, { status: 400 });
   }
 
   const { sender, destination, amount, mintSymbol } = validationResult;
-  let signedTransactionBytes: string | null = null;
+
   try {
-    const unsignedTransactionBytes = await createSplTransfer(sender, destination, amount, mintSymbol);
+    const splTransferRecord = await createSplTransfer(sender, destination, amount, mintSymbol);
 
-    // TODO: sign the transaction
-    // const signedTransactionBytes = await signTransaction(unsignedTransactionBytes);
-    signedTransactionBytes = unsignedTransactionBytes;
+    return NextResponse.json({
+        type: 'transaction',
+        message: `Send ${amount} to ${destination}`,
+        transaction: splTransferRecord.unsignedTransactionBytes,
+    }, { headers });
+
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create transaction' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ 
+      error: `Failed to create transaction: ${errorMessage}` 
+    }, { status: 500 });
   }
-  if (!signedTransactionBytes) {
-    return NextResponse.json({ error: 'Failed to create transaction' }, { status: 500 });
-  }
-
-  return NextResponse.json({
-    type: 'transaction',
-    transaction: signedTransactionBytes,
-  }, { headers });
 };
 
