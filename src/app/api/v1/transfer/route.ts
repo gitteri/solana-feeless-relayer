@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validate } from 'uuid';
 import { SplTransfer, TransactionStatus } from '@/app/types/splTransfer';
-import { getSplTransfer } from '@/logic/transactionLogic';
+import { getSplTransfer } from '@/logic/transactionEngine';
 
 // This type is used to return the transaction to the client.
 // It is used to hide certain fields from the public.
