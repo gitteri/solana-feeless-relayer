@@ -44,6 +44,8 @@ const validateCreateSplTransferRequest = async (req: NextRequest): Promise<{ err
   };
 }
 
+export const OPTIONS = GET;
+
 // Handle GET requests to retrieve the action for creating a new SPL transfer
 export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse | { error: string }>) {  
     if (!req.url) {
