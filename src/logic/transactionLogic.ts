@@ -45,6 +45,8 @@ export async function createSplTransfer(sender: string, destination: string, amo
     mintSymbol,
     unsignedTransactionBytes: Buffer.from(splTransferTxn.serialize()),
     currentStatus: transactionStatuses.INIT,
+    feeInLamports: RELAY_FEE,
+    feeInSpl: RELAY_FEE,
   };
 
   // return serialized unsigned transaction bytes

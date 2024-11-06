@@ -12,6 +12,9 @@ export class EmbeddedWallet {
     }
 
     static get(): core {
+        if (!this.walletCore) {
+            throw new Error('EmbeddedWallet not initialized');
+        }
         return this.walletCore!;
     }
 }

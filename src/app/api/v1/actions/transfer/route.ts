@@ -1,10 +1,12 @@
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { ActionGetResponse, ActionPostRequest, ActionPostResponse, createActionHeaders } from '@solana/actions';
+import { ActionGetResponse, ActionPostRequest, ActionPostResponse, createActionHeaders, createPostResponse } from '@solana/actions';
 import { supportedMints } from '@/app/config/mint';
 import { createSplTransfer } from '@/logic/transactionLogic';
 import { validatePublicKeyString } from '@/utils/publicKey';
+import { EmbeddedWallet } from '@/utils/EmbeddedWallet';
+import { Transaction, VersionedMessage, VersionedTransaction } from '@solana/web3.js';
 
 
 // create the standard headers for this route (including CORS)
@@ -43,16 +45,7 @@ const validateCreateSplTransferRequest = async (req: NextRequest): Promise<{ err
 }
 
 // Handle GET requests to retrieve the action for creating a new SPL transfer
-export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse | { error: string }>) {
-    // Return dummy data for testing
-    return NextResponse.json({
-      type: "action",
-      title: "Test Action",
-      description: "Test description",
-      icon: "https://example.com/test.png",
-      label: "Test"
-    }, { headers });
-  
+export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse | { error: string }>) {  
     if (!req.url) {
     return NextResponse.json({ error: 'Request URL is required' }, { status: 400 });
   }
@@ -117,6 +110,8 @@ export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse 
 
 // Handle POST requests to create a new transaction
 export async function POST(req: NextRequest, res: NextResponse<ActionPostResponse | { error: string }>) {
+  await EmbeddedWallet.initialize();
+
   const validationResult = await validateCreateSplTransferRequest(req);
   if ('error' in validationResult) {
     return NextResponse.json({ error: validationResult.error }, { status: 400 });
@@ -126,6 +121,22 @@ export async function POST(req: NextRequest, res: NextResponse<ActionPostRespons
 
   try {
     const signedTransactionBytes = await createSplTransfer(sender, destination, amount, mintSymbol);
+
+
+
+    const payload: ActionPostResponse = await createPostResponse({
+        fields: {
+          type: 'transaction',
+          transaction: VersionedTransaction.deserialize(new Uint8Array(signedTransactionBytes)),
+          message: `Send ${amount} to ${destination}`,
+        },
+        // note: no additional signers are needed
+        // signers: [],
+      });
+  
+      return Response.json(payload, {
+        headers,
+      });
 
     return NextResponse.json({
         type: 'transaction',

@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
     }
 
     // Ensure the embedded wallet is ready for use on every request.
-    //EmbeddedWallet.initialize();
+    EmbeddedWallet.initialize();
 
     return NextResponse.next();
   }
