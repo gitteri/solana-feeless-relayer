@@ -1,4 +1,4 @@
-import {core, KeystoreType, } from 'tinywallet';
+import { core, KeystoreType } from 'tinywallet';
 export {ix_Transfer, ix_TransferSPL} from 'tinywallet/dist/instructionbuilder';
 
 // A singleton class to manage the embedded wallet.
