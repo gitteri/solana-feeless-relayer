@@ -7,7 +7,7 @@ export async function getSplTransfer(id: string): Promise<SplTransfer | null> {
   return await getSplTransferById(id);
 }
 
-export async function createSplTransfer(sender: string, destination: string, amount: string, mintSymbol: string): Promise<string | undefined> {
+export async function createSplTransfer(sender: string, destination: string, amount: string, mintSymbol: string): Promise<Buffer> {
   const mintAddress = supportedMints[mintSymbol as keyof typeof supportedMints];
   const relayWallet = await EmbeddedWallet.get();
 
@@ -43,7 +43,7 @@ export async function createSplTransfer(sender: string, destination: string, amo
     amount,
     mint: mintAddress,
     mintSymbol,
-    unsignedTransactionBytes: Buffer.from(splTransferTxn.serialize()).toString('base64'),
+    unsignedTransactionBytes: Buffer.from(splTransferTxn.serialize()),
     currentStatus: transactionStatuses.INIT,
   };
 

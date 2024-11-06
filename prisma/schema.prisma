@@ -24,8 +24,8 @@ model SplTransfer {
   sender                   String
   feeInLamports            String
   feeInSpl                 String
-  unsignedTransactionBytes String
-  signedTransactionBytes   String?
+  unsignedTransactionBytes Bytes
+  signedTransactionBytes   Bytes?
   statuses                 TransactionStatus[]
   createdAt                DateTime            @default(now())
 }

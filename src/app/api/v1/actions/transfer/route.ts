@@ -44,7 +44,16 @@ const validateCreateSplTransferRequest = async (req: NextRequest): Promise<{ err
 
 // Handle GET requests to retrieve the action for creating a new SPL transfer
 export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse | { error: string }>) {
-  if (!req.url) {
+    // Return dummy data for testing
+    return NextResponse.json({
+      type: "action",
+      title: "Test Action",
+      description: "Test description",
+      icon: "https://example.com/test.png",
+      label: "Test"
+    }, { headers });
+  
+    if (!req.url) {
     return NextResponse.json({ error: 'Request URL is required' }, { status: 400 });
   }
 

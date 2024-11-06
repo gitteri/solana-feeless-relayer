@@ -10,8 +10,8 @@ export type SplTransfer = {
   sender: string;
   feeInLamports?: string;
   feeInSpl?: string;
-  unsignedTransactionBytes?: string;
-  signedTransactionBytes?: string;
+  unsignedTransactionBytes: Buffer;
+  signedTransactionBytes?: Buffer;
   currentStatus: TransactionStatus;
   createdAt?: Date;
   statuses?: TransactionStatusHistory[];
