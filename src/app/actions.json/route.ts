@@ -11,7 +11,7 @@ export const GET = async () => {
   };
 
   return Response.json(payload, {
-    headers: createActionHeaders(),
+    headers: createActionHeaders({ chainId: 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1', actionVersion: '2.1.3' }),
   });
 };
 

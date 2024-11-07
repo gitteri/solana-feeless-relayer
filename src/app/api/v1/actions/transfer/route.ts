@@ -7,7 +7,7 @@ import { createSplTransfer } from '@/logic/transactionEngine';
 import { validatePublicKeyString } from '@/utils/publicKey';
 
 // create the standard headers for this route (including CORS)
-const headers = createActionHeaders();
+const headers = createActionHeaders({ chainId: 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1', actionVersion: '2.1.3' });
 
 // Validate the request body for creating a new SPL transfer
 const validateCreateSplTransferRequest = async (req: NextRequest): Promise<{ error: string } | { sender: string, destination: string, amount: string, mintSymbol: string }> => {
@@ -55,17 +55,18 @@ export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse 
   }
 
   const requestUrl = new URL(req.url);
-
+  console.log('requestUrl', requestUrl);
+  const ngrokOverride = 'https://suitable-prime-fish.ngrok-free.app';
   const baseHref = new URL(
     'api/v1/actions/transfer',
-    requestUrl.origin,
+    ngrokOverride,
   ).toString();
 
 
   const payload: ActionGetResponse = {
     type: "action",
     title: "Token Transfer Without SOL",
-    icon: new URL("/logo.jpeg", requestUrl.origin).toString(),
+    icon: new URL("/logo.jpeg", ngrokOverride).toString(),
     description: "Transfer a token to another Solana wallet without needing SOL in your wallet",
     label: "Transfer", // this value will be ignored since `links.actions` exists
     links: {
@@ -79,10 +80,15 @@ export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse 
               name: "amount", // parameter name in the `href` above
               label: "Enter the amount of USDC to send", // placeholder of the text input
               required: true,
+              pattern: "^[0-9]*\\.?[0-9]+$", // allow for decimals
+              patternDescription: "Must be a number",
+              min: 0.01, // allow for decimals
             },
             {
               name: "destination", // parameter name in the `href` above
               label: "Enter the destination Solana wallet address", // placeholder of the text input
+              pattern: "^[a-zA-Z0-9]{32,44}$",
+              patternDescription: "Must be a valid Solana wallet address",
               required: true,
             },
           ],
@@ -96,13 +102,17 @@ export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse 
               name: "amount", // parameter name in the `href` above
               type: "number",
               label: "Enter the amount of USDT to send", // placeholder of the text input
+              pattern: "^[0-9]*\\.?[0-9]+$", // allow for decimals
+              patternDescription: "Must be a number",
               required: true,
-              min: 1,
+              min: 0.01, // allow for decimals
             },
             {
               name: "destination", // parameter name in the `href` above
               type: "text",
               label: "Enter the destination Solana wallet address", // placeholder of the text input
+              pattern: "^[a-zA-Z0-9]{32,44}$",
+              patternDescription: "Must be a valid Solana wallet address",
               required: true,
             },
           ],
@@ -117,6 +127,7 @@ export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse 
 
 // Handle POST requests to create a new transaction
 export async function POST(req: NextRequest, res: NextResponse<ActionPostResponse | { error: string }>) {
+  console.log('POST request received');
 
   const validationResult = await validateCreateSplTransferRequest(req);
   if ('error' in validationResult) {
@@ -136,6 +147,7 @@ export async function POST(req: NextRequest, res: NextResponse<ActionPostRespons
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
+    console.log('error', errorMessage);
     return NextResponse.json({ 
       error: `Failed to create transaction: ${errorMessage}` 
     }, { status: 500 });

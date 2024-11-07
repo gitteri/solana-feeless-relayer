@@ -7,7 +7,7 @@
     "anchor-build": "cd anchor && anchor build",
     "anchor-localnet": "cd anchor && anchor localnet",
     "anchor-test": "cd anchor && anchor test",
-    "dev": "next dev",
+    "dev": "next dev -p 80",
     "build": "prisma generate && prisma db push && next build",
     "build-ci": "prisma generate && next build",
     "start": "next start",

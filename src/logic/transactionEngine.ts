@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
+import Decimal from 'decimal.js';
 import { PublicKey, TransactionInstruction, SystemProgram } from '@solana/web3.js';
+import { getAccountLenForMint, getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID, createInitializeAccountInstruction, getMint } from '@solana/spl-token';
 import { SplTransfer, transactionStatuses } from '@/app/types/splTransfer';
 import { getMintInfo } from '@/app/config/mint';
-import { RpcService } from '@/services/rpcService';
+import { RpcService, TOKEN_PROGRAM_ADDRESS } from '@/services/rpcService';
 import { getSplTransferById, createSplTransfer as createSplTransferInDb } from '@/services/db/queries/splTransfer';
 import { EmbeddedWallet, ix_TransferSPL } from '@/utils/EmbeddedWallet';
-import { getAssociatedTokenAddressSync, getMint, getAccountLenForMint } from '@solana/spl-token';
-import { TOKEN_PROGRAM_ID, createInitializeAccountInstruction, createAccount } from '@solana/spl-token';
 
 export async function getSplTransfer(id: string): Promise<SplTransfer | null> {
   return await getSplTransferById(id);
@@ -25,23 +25,22 @@ async function createSplTokenAccountInstructions(
   if (await rpcService.hasTokenAccount(ownerPublicKey, mintPublicKey)) {
     return null;
   }
-  const mintState = await getMint(rpcService.connection, mintPublicKey, undefined, programId);
+  const mintState = await getMint(rpcService.connection, mintPublicKey);
   const space = getAccountLenForMint(mintState);
   const lamports = await rpcService.connection.getMinimumBalanceForRentExemption(space);
-  const newAccount = await getAssociatedTokenAddressSync(ownerPublicKey, mintPublicKey, true, TOKEN_PROGRAM_ID);
+  const newAccount = await getAssociatedTokenAddressSync(ownerPublicKey, mintPublicKey);
 
   return [SystemProgram.createAccount({
     fromPubkey: feePayerPublicKey,
     newAccountPubkey: newAccount,
     space: space,
     lamports: lamports,
-    programId: TOKEN_PROGRAM_ID,
+    programId: programId,
   }),
   createInitializeAccountInstruction(
     newAccount,
     mintPublicKey,
     ownerPublicKey,
-    TOKEN_PROGRAM_ID,
   )
   ];
 }
@@ -51,7 +50,8 @@ export async function createSplTransfer(sender: string, destination: string, amo
   const relayWallet = EmbeddedWallet.get();
 
   // TODO: make this dynamic and based on if the token account needs to be created
-  const RELAY_FEE = '500000'; // 0.50 USDC/USDT (6 decimal places)
+  // const RELAY_FEE = '500000'; // 0.50 USDC/USDT (6 decimal places)
+  const RELAY_FEE = '500'; // 0.50 USDC/USDT (6 decimal places)
   const relayWalletPublicKey = await relayWallet.keymanager.getAddress();
 
   const memoId = uuidv4();
@@ -65,15 +65,16 @@ export async function createSplTransfer(sender: string, destination: string, amo
     sender,
     await relayWallet.keymanager.getAddress(),
     RELAY_FEE,
-    mint.address,
+    TOKEN_PROGRAM_ADDRESS,
     mint.address
   );
 
+  const amountLamports = mint.decimals === 0 ? amount : new Decimal(amount).mul(new Decimal(10).pow(mint.decimals)).toString();
   const ix_transfer = await ix_TransferSPL(
     sender,
     destination,
-    amount,
-    mint.address,
+    amountLamports,
+    TOKEN_PROGRAM_ADDRESS,
     mint.address
   );
 

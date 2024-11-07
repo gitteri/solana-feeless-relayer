@@ -9,6 +9,10 @@ const supportedMints: Record<string, MintInfo> = {
     address: '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU', // devnet
     decimals: 6,
   },
+  'USDT': {
+    address: '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU', // lol what's the devnet USDT address?? can't find it anywhere.
+    decimals: 6,
+  },
 };
 
 export const getMintInfo = (mintSymbol?: string): MintInfo => {
