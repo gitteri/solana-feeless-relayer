@@ -8,7 +8,7 @@ export class EmbeddedWallet {
 
     private static async initialize(): Promise<void> {
         if (!this.walletCore) {
-            this.walletCore = await core.CreateAsync(KeystoreType.Turnkey);
+            this.walletCore = await core.CreateAsync();
         }
     }
 
