@@ -22,10 +22,10 @@ async function createSplTokenAccountInstructions(
   const ownerPublicKey = new PublicKey(owner);
   const mintPublicKey = new PublicKey(mint);
   if (await rpcService.hasTokenAccount(ownerPublicKey, mintPublicKey)) {
-    console.log('already has token account');
+    console.debug('recipient already has token account');
     return null;
   }
-  console.debug('token account not found, creating');
+  console.debug('recipient token account not found, creating');
   const newAccount = getAssociatedTokenAddressSync(mintPublicKey, ownerPublicKey);
   return createAssociatedTokenAccountInstruction(feePayerPublicKey, newAccount, ownerPublicKey, mintPublicKey)
 }
@@ -35,8 +35,7 @@ export async function createSplTransfer(sender: string, destination: string, amo
   const relayWallet = EmbeddedWallet.get();
 
   // TODO: make this dynamic and based on if the token account needs to be created
-  // const RELAY_FEE = '500000'; // 0.50 USDC/USDT (6 decimal places)
-  const RELAY_FEE = '500'; // 0.50 USDC/USDT (6 decimal places)
+  const RELAY_FEE = '50000'; // 0.05 USDC/USDT (6 decimal places)
   const relayWalletPublicKey = await relayWallet.keymanager.getAddress();
 
   const memoId = uuidv4();

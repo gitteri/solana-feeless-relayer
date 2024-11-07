@@ -6,7 +6,7 @@ import { updateTransferDetails } from '@/logic/transferTracker';
 
 export async function POST(req: NextRequest, res: NextResponse) {  // accept a webhook from helius and process it
   const body: EnrichedTransaction[] = await req.json();
-  console.log('helius webhook', body);
+  console.debug('helius webhook received', body);
 
   body.forEach(async (tx) => {
     try {
