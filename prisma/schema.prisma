@@ -15,17 +15,21 @@ datasource db {
 
 model SplTransfer {
   id                       String              @id @default(cuid())
-  referenceId              String?
+  referenceId              String?             @unique
   requestedByIp            String?
+  signature                String?
   amount                   String
   mint                     String
   mintSymbol               String
   destination              String
   sender                   String
+  feePayer                 String
   feeInLamports            String
   feeInSpl                 String
   unsignedTransactionBytes Bytes
   signedTransactionBytes   Bytes?
+  slot                     Int?
+  timestampIncluded        DateTime?
   statuses                 TransactionStatus[]
   createdAt                DateTime            @default(now())
 }

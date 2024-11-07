@@ -40,3 +40,6 @@ tmp
 # vscode
 .vscode
 .vscode/settings.json
+
+# local keystore test
+/keystore

@@ -29,6 +29,10 @@ export const getSplTransferById = async (id: string): Promise<SplTransfer | null
         referenceId: dbTransaction.referenceId ?? undefined,
         requestedByIp: dbTransaction.requestedByIp ?? undefined,
         signedTransactionBytes: dbTransaction.signedTransactionBytes ?? undefined,
+        feePayer: dbTransaction.feePayer ?? undefined,
+        signature: dbTransaction.signature ?? undefined,
+        slot: dbTransaction.slot ?? undefined,
+        timestampIncluded: dbTransaction.timestampIncluded ?? undefined,
         currentStatus: dbTransaction.statuses[dbTransaction.statuses.length - 1].status as TransactionStatus,
         statuses: dbTransaction.statuses.map(status => ({
             ...status,
@@ -61,6 +65,7 @@ export const createSplTransfer = async (data: SplTransfer) => {
             sender: data.sender,
             feeInLamports: data.feeInLamports,
             feeInSpl: data.feeInSpl,
+            feePayer: data.feePayer,
             unsignedTransactionBytes: data.unsignedTransactionBytes,
             statuses: {
                 create: [{
@@ -72,4 +77,19 @@ export const createSplTransfer = async (data: SplTransfer) => {
     });
 
     return data;
+};
+
+// Function to update a transaction
+export const updateSplTransfer = async (referenceId: string, data: Partial<SplTransfer>) => {
+    await prisma.splTransfer.update({
+        where: { referenceId },
+        data: {
+            ...data,
+            statuses: undefined
+        }
+    });
+};
+
+export const addTransactionStatus = async (referenceId: string, status: TransactionStatus) => {
+    await prisma.transactionStatus.create({ data: { splTransferId: referenceId, status, createdAt: new Date() } });
 };

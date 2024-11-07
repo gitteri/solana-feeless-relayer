@@ -1,6 +1,7 @@
 
 export type SplTransfer = {
   id: string;
+  signature?: string;
   referenceId?: string;
   requestedByIp?: string;
   amount: string;
@@ -8,11 +9,14 @@ export type SplTransfer = {
   mintSymbol: string;
   destination: string;
   sender: string;
+  feePayer: string;
   feeInLamports?: string;
   feeInSpl?: string;
   unsignedTransactionBytes: Buffer;
   signedTransactionBytes?: Buffer;
   currentStatus: TransactionStatus;
+  slot?: number;
+  timestampIncluded?: Date;
   createdAt?: Date;
   statuses?: TransactionStatusHistory[];
 };
