@@ -24,8 +24,9 @@ model SplTransfer {
   destination              String
   sender                   String
   feePayer                 String
+  estimatedFeeInLamports   String
   feeInLamports            String
-  feeInSpl                 String
+  feeInSpl                 String?
   unsignedTransactionBytes Bytes
   signedTransactionBytes   Bytes?
   slot                     Int?

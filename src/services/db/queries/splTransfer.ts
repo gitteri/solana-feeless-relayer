@@ -49,8 +49,8 @@ export const createSplTransfer = async (data: SplTransfer) => {
     if (!data.feeInLamports) {
         throw new Error('feeInLamports is required');
     }
-    if (!data.feeInSpl) {
-        throw new Error('feeInSpl is required');
+    if (!data.estimatedFeeInLamports) {
+        throw new Error('estimatedFeeInLamports is required');
     }
     
     await prisma.splTransfer.create({
@@ -66,6 +66,7 @@ export const createSplTransfer = async (data: SplTransfer) => {
             feeInLamports: data.feeInLamports,
             feeInSpl: data.feeInSpl,
             feePayer: data.feePayer,
+            estimatedFeeInLamports: data.estimatedFeeInLamports,
             unsignedTransactionBytes: data.unsignedTransactionBytes,
             statuses: {
                 create: [{

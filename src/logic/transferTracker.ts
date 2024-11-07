@@ -10,7 +10,7 @@ import bs58 from 'bs58';
  */
 export async function updateTransferDetails(enrichedTransaction: EnrichedTransaction): Promise<void> {
   try {
-    const { signature, instructions, slot, timestamp, nativeTransfers, tokenTransfers } = enrichedTransaction;
+    const { signature, instructions, slot, timestamp, fee } = enrichedTransaction;
 
     const memoIx = instructions.find((instruction) => {
       return instruction.programId.toString() === 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr';
@@ -26,6 +26,7 @@ export async function updateTransferDetails(enrichedTransaction: EnrichedTransac
 
     // Construct the update payload
     const updatePayload = {
+      feeInLamports: fee.toString(),
       signature,
       slot,
       timestampIncluded: new Date(timestamp * 1000),

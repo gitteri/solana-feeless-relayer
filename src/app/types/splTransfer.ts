@@ -10,6 +10,7 @@ export type SplTransfer = {
   destination: string;
   sender: string;
   feePayer: string;
+  estimatedFeeInLamports?: string;
   feeInLamports?: string;
   feeInSpl?: string;
   unsignedTransactionBytes: Buffer;

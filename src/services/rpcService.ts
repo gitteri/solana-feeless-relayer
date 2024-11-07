@@ -94,6 +94,21 @@ export class RpcService {
     }
   }
 
+  async hasTokenAccount(publicKey: PublicKey, mint: PublicKey, programId = TOKEN_PROGRAM_ID): Promise<boolean> {
+    try {
+      const ata = getAssociatedTokenAddressSync(publicKey, mint, true, programId);
+      const info = await this.connection.getAccountInfo(ata);
+      return info !== null;
+    } catch (error) {
+      if (error instanceof TokenAccountNotFoundError || error instanceof TokenInvalidAccountOwnerError) {
+        return false;
+      }
+
+      console.debug("Debug: error checking for token account:", error);
+      throw error;
+    }
+  }
+
   /**
    * Get the SPL token balance for a given public key and mint
    * @param {PublicKey} publicKey - The public key to check the balance for
@@ -104,10 +119,10 @@ export class RpcService {
   async getSplBalance(publicKey: PublicKey, mint: PublicKey, programId = TOKEN_PROGRAM_ID): Promise<string> {
     const ata = getAssociatedTokenAddressSync(publicKey, mint, true, programId);
     try {
-      const info = await this.connection.getAccountInfo(ata);
-      if (info === null) {
+      if (!await this.hasTokenAccount(publicKey, mint, programId)) {
         return '0';
       }
+
       const tokenAccountBalance = await this.connection.getTokenAccountBalance(ata);
       const balance = tokenAccountBalance.value.uiAmountString;
       if (balance === undefined) {
