@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import Decimal from 'decimal.js';
-import { PublicKey, TransactionInstruction, SystemProgram } from '@solana/web3.js';
-import { getAccountLenForMint, getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID, createInitializeAccountInstruction, getMint } from '@solana/spl-token';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { getAssociatedTokenAddressSync, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
 import { SplTransfer, transactionStatuses } from '@/app/types/splTransfer';
 import { getMintInfo } from '@/app/config/mint';
 import { RpcService, TOKEN_PROGRAM_ADDRESS } from '@/services/rpcService';
@@ -16,33 +16,18 @@ async function createSplTokenAccountInstructions(
   feePayer: string,
   owner: string,
   mint: string,
-  programId = TOKEN_PROGRAM_ID
-): Promise<TransactionInstruction[] | null> {
+): Promise<TransactionInstruction | null> {
   const rpcService = new RpcService();
   const feePayerPublicKey = new PublicKey(feePayer);
   const ownerPublicKey = new PublicKey(owner);
   const mintPublicKey = new PublicKey(mint);
   if (await rpcService.hasTokenAccount(ownerPublicKey, mintPublicKey)) {
+    console.log('already has token account');
     return null;
   }
-  const mintState = await getMint(rpcService.connection, mintPublicKey);
-  const space = getAccountLenForMint(mintState);
-  const lamports = await rpcService.connection.getMinimumBalanceForRentExemption(space);
-  const newAccount = await getAssociatedTokenAddressSync(ownerPublicKey, mintPublicKey);
-
-  return [SystemProgram.createAccount({
-    fromPubkey: feePayerPublicKey,
-    newAccountPubkey: newAccount,
-    space: space,
-    lamports: lamports,
-    programId: programId,
-  }),
-  createInitializeAccountInstruction(
-    newAccount,
-    mintPublicKey,
-    ownerPublicKey,
-  )
-  ];
+  console.debug('token account not found, creating');
+  const newAccount = getAssociatedTokenAddressSync(mintPublicKey, ownerPublicKey);
+  return createAssociatedTokenAccountInstruction(feePayerPublicKey, newAccount, ownerPublicKey, mintPublicKey)
 }
 
 export async function createSplTransfer(sender: string, destination: string, amount: string, mintSymbol: string): Promise<SplTransfer> {
@@ -79,15 +64,15 @@ export async function createSplTransfer(sender: string, destination: string, amo
   );
 
   // TODO: if getting a rebate also transfer close account authority to a different account to prevent a drain attack
-  const ix_createAccount = await createSplTokenAccountInstructions(relayWalletPublicKey, sender, mint.address);
+  const ix_createAccount = await createSplTokenAccountInstructions(relayWalletPublicKey, destination, mint.address);
 
   const splTransferTxn = await relayWallet.BuildTransaction(
-    [ix_memo, ix_fee, ...(ix_createAccount ?? []), ix_transfer], 
+    [ix_memo, ix_fee, ...(ix_createAccount ? [ix_createAccount] : []), ix_transfer],
     await relayWallet.keymanager.getPublicKey()
   );
 
   const rpcService = new RpcService();
-  const estimatedFeeInLamports = await rpcService.estimateFeeInLamports(mintSymbol);  
+  const estimatedFeeInLamports = await rpcService.estimateFeeInLamports(mintSymbol);
 
   await relayWallet.SignTransaction(splTransferTxn);
 

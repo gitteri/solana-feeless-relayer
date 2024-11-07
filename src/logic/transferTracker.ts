@@ -33,8 +33,8 @@ export async function updateTransferDetails(enrichedTransaction: EnrichedTransac
     };
 
     // Update the transfer record in the database
-    await updateSplTransfer(referenceId, updatePayload);
-    await addTransactionStatus(referenceId, transactionStatuses.CONFIRMED);
+    const updatedId = await updateSplTransfer(referenceId, updatePayload);
+    await addTransactionStatus(updatedId, transactionStatuses.CONFIRMED);
     console.log(`Successfully updated transfer record for transaction ID: ${signature}`);
   } catch (error) {
     console.error("Error updating transfer record:", error);

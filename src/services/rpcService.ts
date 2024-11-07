@@ -99,7 +99,7 @@ export class RpcService {
 
   async hasTokenAccount(publicKey: PublicKey, mint: PublicKey, programId = TOKEN_PROGRAM_ID): Promise<boolean> {
     try {
-      const ata = getAssociatedTokenAddressSync(publicKey, mint, true, programId);
+      const ata = getAssociatedTokenAddressSync(mint, publicKey, false, programId);
       const info = await this.connection.getAccountInfo(ata);
       return info !== null;
     } catch (error) {

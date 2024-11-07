@@ -80,13 +80,14 @@ export const createSplTransfer = async (data: SplTransfer) => {
 
 // Function to update a transaction
 export const updateSplTransfer = async (referenceId: string, data: Partial<SplTransfer>) => {
-  await prisma.splTransfer.update({
+  const updated = await prisma.splTransfer.update({
     where: { referenceId },
     data: {
       ...data,
       statuses: undefined
     }
   });
+  return updated.id;
 };
 
 export const addTransactionStatus = async (referenceId: string, status: TransactionStatus) => {
