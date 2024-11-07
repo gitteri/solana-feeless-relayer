@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { getSplTransferById, createSplTransfer as createSplTransferInDb } from '@/services/db/queries/splTransfer';
+import { TOKEN_PROGRAM_ADDRESS } from '@/services/rpcService';
 import { SplTransfer, transactionStatuses } from '@/app/types/splTransfer';
 import { getMintInfo } from '@/app/config/mint';
 import { EmbeddedWallet, ix_TransferSPL } from '@/utils/EmbeddedWallet';
@@ -17,7 +18,7 @@ export async function createSplTransfer(sender: string, destination: string, amo
     sender,
     await relayWallet.keymanager.getAddress(),
     RELAY_FEE,
-    mint.address,
+    TOKEN_PROGRAM_ADDRESS,
     mint.address
   );
 
@@ -25,7 +26,7 @@ export async function createSplTransfer(sender: string, destination: string, amo
     sender,
     destination,
     amount,
-    mint.address,
+    TOKEN_PROGRAM_ADDRESS,
     mint.address
   );
 

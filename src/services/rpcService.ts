@@ -8,6 +8,7 @@ import {
   createTransferCheckedInstruction,
   getAssociatedTokenAddressSync,
   TOKEN_PROGRAM_ID,
+  TOKEN_2022_PROGRAM_ID,
   TokenAccountNotFoundError,
   TokenInvalidAccountOwnerError,
 } from '@solana/spl-token';
@@ -16,6 +17,8 @@ import { getMintInfo } from '@/app/config/mint';
 
 const DEFAULT_DEVNET_RPC_ENDPOINT = 'https://api.devnet.solana.com';
 const DEFAULT_MAINNET_RPC_ENDPOINT = 'https://api.mainnet-beta.solana.com';
+export const TOKEN_PROGRAM_ADDRESS = TOKEN_PROGRAM_ID.toBase58();
+export const TOKEN_2022_PROGRAM_ADDRESS = TOKEN_2022_PROGRAM_ID.toBase58();
 
 /**
  * RpcService: A class for interacting with the Solana RPC
