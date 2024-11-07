@@ -131,9 +131,6 @@ export class RpcService {
       return balance;
     } catch (error) {
       console.debug("Debug: error fetching SPL balance:", error);
-      if (error instanceof TokenAccountNotFoundError || error instanceof TokenInvalidAccountOwnerError) {
-        return '0';
-      }
       throw error;
     }
   }
