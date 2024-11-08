@@ -7,6 +7,7 @@ skip-lint = false
 
 [programs.localnet]
 basic = "6z68wfurCMYkZG51s1Et9BJEd9nJGUusjHXNt4dGbNNF"
+sponsor-relayer = "5Gdnpj8THruSLpvAmP4x9V2YThPT633BiBa9vHvGyXBz"
 
 [registry]
 url = "https://api.apr.dev"

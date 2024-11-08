@@ -1,0 +1,441 @@
+{
+  "address": "5Gdnpj8THruSLpvAmP4x9V2YThPT633BiBa9vHvGyXBz",
+  "metadata": {
+    "name": "sponsor_relayer",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "authorize_relayer",
+      "discriminator": [
+        164,
+        158,
+        129,
+        204,
+        201,
+        28,
+        143,
+        11
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "sponsorship"
+          ]
+        },
+        {
+          "name": "relayer",
+          "writable": true
+        },
+        {
+          "name": "sponsorship",
+          "relations": [
+            "relayer"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "sponsor_cap",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "block_relayer",
+      "discriminator": [
+        111,
+        206,
+        180,
+        12,
+        163,
+        90,
+        168,
+        72
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "sponsorship"
+          ]
+        },
+        {
+          "name": "relayer"
+        },
+        {
+          "name": "sponsorship"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "close_relayer",
+      "discriminator": [
+        63,
+        107,
+        176,
+        209,
+        253,
+        239,
+        18,
+        193
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "close_sponsorship",
+      "discriminator": [
+        48,
+        49,
+        37,
+        139,
+        2,
+        175,
+        255,
+        161
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "sponsorship"
+          ]
+        },
+        {
+          "name": "sponsorship"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_relayer",
+      "discriminator": [
+        145,
+        167,
+        151,
+        150,
+        126,
+        228,
+        236,
+        207
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "relayer",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "relayer_wallet"
+              }
+            ]
+          }
+        },
+        {
+          "name": "sponsorship"
+        },
+        {
+          "name": "relayer_wallet"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_sponsorship",
+      "discriminator": [
+        116,
+        246,
+        140,
+        95,
+        48,
+        27,
+        84,
+        48
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "sponsorship",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  112,
+                  111,
+                  110,
+                  115,
+                  111,
+                  114,
+                  115,
+                  104,
+                  105,
+                  112
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "max_priority_fee",
+          "type": "u64"
+        },
+        {
+          "name": "allow_permissionless_relayers",
+          "type": "bool"
+        },
+        {
+          "name": "mint",
+          "type": {
+            "option": "pubkey"
+          }
+        },
+        {
+          "name": "sponsor_amount",
+          "type": "u64"
+        },
+        {
+          "name": "fund_rent",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "relay",
+      "discriminator": [
+        109,
+        130,
+        24,
+        215,
+        1,
+        255,
+        37,
+        114
+      ],
+      "accounts": [
+        {
+          "name": "relayer_wallet",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "relayer"
+          ]
+        },
+        {
+          "name": "relayer"
+        },
+        {
+          "name": "sponsorship",
+          "writable": true,
+          "relations": [
+            "relayer"
+          ]
+        },
+        {
+          "name": "instructions",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Relayer",
+      "discriminator": [
+        168,
+        116,
+        52,
+        174,
+        161,
+        196,
+        71,
+        218
+      ]
+    },
+    {
+      "name": "Sponsorship",
+      "discriminator": [
+        191,
+        110,
+        48,
+        7,
+        9,
+        44,
+        168,
+        248
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidTipAccount",
+      "msg": "Invalid tip account"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidMint",
+      "msg": "Invalid mint"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidCloseAuthority",
+      "msg": "Invalid close authority"
+    },
+    {
+      "code": 6003,
+      "name": "CloseAuthorityNotSet",
+      "msg": "Close authority not set"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidProgram",
+      "msg": "Invalid program"
+    },
+    {
+      "code": 6005,
+      "name": "MaxPriorityFeeExceeded",
+      "msg": "Max priority fee exceeded"
+    },
+    {
+      "code": 6006,
+      "name": "AttemptedToInitializeExistingAccount",
+      "msg": "Attempted to initialize existing account"
+    },
+    {
+      "code": 6007,
+      "name": "MultipleCalls",
+      "msg": "Multiple calls in a single transaction"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidInstruction",
+      "msg": "Invalid instruction"
+    }
+  ],
+  "types": [
+    {
+      "name": "Relayer",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "sponsorship",
+            "type": "pubkey"
+          },
+          {
+            "name": "relayer_wallet",
+            "type": "pubkey"
+          },
+          {
+            "name": "sponsor_cap",
+            "type": "u64"
+          },
+          {
+            "name": "authorized",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sponsorship",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "max_priority_fee",
+            "type": "u64"
+          },
+          {
+            "name": "allow_permissionless_relayers",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "fund_rent",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ]
+}
