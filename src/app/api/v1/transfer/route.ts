@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validate } from 'uuid';
 import { SplTransfer, TransactionStatus } from '@/app/types/splTransfer';
-import { getSplTransfer } from '@/logic/transactionEngine';
+import { getSplTransfer, getSplTransfers } from '@/logic/transactionEngine';
 
 // This type is used to return the transaction to the client.
 // It is used to hide certain fields from the public.
@@ -19,33 +19,16 @@ const splTransferToPublicSplTransfer = (splTransfer: SplTransfer): PublicSplTran
   };
 };
 
-const validateGetSplTransferRequest = (id?: any): { error: string } | null => {
-  if (!id) {
-    return { error: 'Transaction ID is required' };
-  }
-  if (typeof id !== 'string') {
-    return { error: 'Transaction ID must be a string' };
-  }
-  if (!validate(id)) {
-    return { error: 'Invalid Transaction ID format' };
-  }
-  return null;
-}
-
-// Handle GET requests to retrieve a transaction by ID
+// Handle GET requests to retrieve a list of transactions
 // To generate new transactions, use the actions/transfer endpoint.
-export async function GET(req: NextRequest, res: NextResponse<PublicSplTransfer | { error: string }>) {
+export async function GET(req: NextRequest, res: NextResponse<PublicSplTransfer[] | { error: string }>) {
   const requestUrl = new URL(req.url);
-  const id = requestUrl.searchParams.get('id');
+  const limit = parseInt(requestUrl.searchParams.get('limit') ?? '20');
+  const offset = parseInt(requestUrl.searchParams.get('offset') ?? '0');
 
-  const validationError = validateGetSplTransferRequest(id);
-  if (validationError) {
-    return NextResponse.json(validationError, { status: 400 });
-  }
-
-  const splTransfer = await getSplTransfer(id as string);
-  if (!splTransfer) {
+  const splTransfers = await getSplTransfers(limit, offset);
+  if (!splTransfers) {
     return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
   }
-  return NextResponse.json(splTransferToPublicSplTransfer(splTransfer), { status: 200 });
+  return NextResponse.json(splTransfers.map(splTransferToPublicSplTransfer), { status: 200 });
 };

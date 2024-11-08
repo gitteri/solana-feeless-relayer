@@ -1,7 +1,8 @@
 import { EnrichedTransaction } from "helius-sdk";
+import bs58 from 'bs58';
+import { memoProgramId } from "@/app/config/mint";
 import { transactionStatuses } from '@/app/types/splTransfer';
 import { addTransactionStatus, updateSplTransfer } from "@/services/db/queries/splTransfer";
-import bs58 from 'bs58';
 
 /**
  * Updates the transfer database record with details from a Helius enriched transaction.
@@ -13,7 +14,7 @@ export async function updateTransferDetails(enrichedTransaction: EnrichedTransac
     const { signature, instructions, slot, timestamp, fee } = enrichedTransaction;
 
     const memoIx = instructions.find((instruction) => {
-      return instruction.programId.toString() === 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr';
+      return instruction.programId.toString() === memoProgramId;
     });
     if (!memoIx) {
       // this is not a relayed transaction, so we don't need to process it

@@ -2,14 +2,18 @@ import { v4 as uuidv4 } from 'uuid';
 import Decimal from 'decimal.js';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { getAssociatedTokenAddressSync, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
+import { memoProgramId, getMintInfo } from '@/app/config/mint';
 import { SplTransfer, transactionStatuses } from '@/app/types/splTransfer';
-import { getMintInfo } from '@/app/config/mint';
 import { RpcService, TOKEN_PROGRAM_ADDRESS } from '@/services/rpcService';
-import { getSplTransferById, createSplTransfer as createSplTransferInDb } from '@/services/db/queries/splTransfer';
+import { getSplTransferById, createSplTransfer as createSplTransferInDb, getSplTransfers as getSplTransfersFromDb } from '@/services/db/queries/splTransfer';
 import { EmbeddedWallet, ix_TransferSPL } from '@/utils/EmbeddedWallet';
 
 export async function getSplTransfer(id: string): Promise<SplTransfer | null> {
   return await getSplTransferById(id);
+}
+
+export async function getSplTransfers(limit: number = 20, offset: number = 0): Promise<SplTransfer[]> {
+  return await getSplTransfersFromDb(limit, offset);
 }
 
 async function createSplTokenAccountInstructions(
@@ -35,14 +39,14 @@ export async function createSplTransfer(sender: string, destination: string, amo
   const relayWallet = EmbeddedWallet.get();
 
   // TODO: make this dynamic and based on if the token account needs to be created
-  const RELAY_FEE = '50000'; // 0.05 USDC/USDT (6 decimal places)
+  const RELAY_FEE = '50000'; // 0.05 USDC/PYUSD (6 decimal places)
   const relayWalletPublicKey = await relayWallet.keymanager.getAddress();
 
   const memoId = uuidv4();
   const ix_memo = new TransactionInstruction({
     keys: [],
     data: Buffer.from(memoId, "utf-8"),
-    programId: new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"),
+    programId: new PublicKey(memoProgramId),
   })
 
   const ix_fee = await ix_TransferSPL(
