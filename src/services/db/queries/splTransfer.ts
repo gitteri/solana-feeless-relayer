@@ -4,9 +4,39 @@ import { prisma } from '../index';
 // This is a collection of functions that are used to interact with the transactions table in the database.
 // This will likely be updated as the project evolves.
 
-// Function to get all transactions
-export const getAllSplTransfers = async () => {
-  return await prisma.splTransfer.findMany();
+// Function to get a list of transactions
+export const getSplTransfers = async (limit: number, offset: number): Promise<SplTransfer[]> => {
+  const dbTransactions = await prisma.splTransfer.findMany({
+    take: limit,
+    skip: offset,
+    orderBy: {
+      createdAt: 'desc',
+    },
+    include: {
+      statuses: {
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
+    },
+  });
+
+  return dbTransactions.map(dbTransaction => ({
+    ...dbTransaction,
+    referenceId: dbTransaction.referenceId ?? undefined,
+    requestedByIp: dbTransaction.requestedByIp ?? undefined,
+    signedTransactionBytes: dbTransaction.signedTransactionBytes ?? undefined,
+    feeInSpl: dbTransaction.feeInSpl ?? undefined,
+    feePayer: dbTransaction.feePayer ?? undefined,
+    signature: dbTransaction.signature ?? undefined,
+    slot: dbTransaction.slot ?? undefined,
+    timestampIncluded: dbTransaction.timestampIncluded ?? undefined,
+    currentStatus: dbTransaction.statuses[0].status as TransactionStatus,
+    statuses: dbTransaction.statuses.map(status => ({
+      ...status,
+      status: status.status as TransactionStatus
+    }))
+  }));
 };
 
 // Function to get a transaction by ID

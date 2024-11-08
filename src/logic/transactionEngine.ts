@@ -5,11 +5,15 @@ import { getAssociatedTokenAddressSync, createAssociatedTokenAccountInstruction 
 import { SplTransfer, transactionStatuses } from '@/app/types/splTransfer';
 import { getMintInfo } from '@/app/config/mint';
 import { RpcService, TOKEN_PROGRAM_ADDRESS } from '@/services/rpcService';
-import { getSplTransferById, createSplTransfer as createSplTransferInDb } from '@/services/db/queries/splTransfer';
+import { getSplTransferById, createSplTransfer as createSplTransferInDb, getSplTransfers as getSplTransfersFromDb } from '@/services/db/queries/splTransfer';
 import { EmbeddedWallet, ix_TransferSPL } from '@/utils/EmbeddedWallet';
 
 export async function getSplTransfer(id: string): Promise<SplTransfer | null> {
   return await getSplTransferById(id);
+}
+
+export async function getSplTransfers(limit: number = 20, offset: number = 0): Promise<SplTransfer[]> {
+  return await getSplTransfersFromDb(limit, offset);
 }
 
 async function createSplTokenAccountInstructions(
