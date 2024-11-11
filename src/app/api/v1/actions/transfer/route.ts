@@ -94,13 +94,13 @@ export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse 
         },
         {
           type: "transaction",
-          label: "Send USDT", // button text
-          href: `${baseHref}?mintSymbol=USDT&amount={amount}&destination={destination}`, // this href will have a text input
+          label: "Send PYUSD", // button text
+          href: `${baseHref}?mintSymbol=PYUSD&amount={amount}&destination={destination}`, // this href will have a text input
           parameters: [
             {
               name: "amount", // parameter name in the `href` above
               type: "number",
-              label: "Enter the amount of USDT to send", // placeholder of the text input
+              label: "Enter the amount of PYUSD to send", // placeholder of the text input
               pattern: "^[0-9]*\\.?[0-9]+$", // allow for decimals
               patternDescription: "Must be a number",
               required: true,
