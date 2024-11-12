@@ -16,7 +16,8 @@ export function bigintToUiString(balance: Decimal, decimals: number): string {
  * @returns {string} The balance in SOL as a string
  */
 export function lamportsToSolString(lamports: bigint): string {
-  return bigintToUiString(new Decimal(lamports.toString()), 9);
+  const SOL_DECIMALS = 9;
+  return bigintToUiString(new Decimal(lamports.toString()), SOL_DECIMALS);
 }
 
 export function stringToUiString(value: string, decimals: number): string {

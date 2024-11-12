@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 
 // needs to be wrapped with <WalletProvider /> and <WalletModalProvider />
 export default function Relay() {
-  const actionApiUrl = 'http://localhost:3000/api/v1/actions/transfer';
+  const actionApiUrl = `${window.location.origin}/api/v1/actions/transfer`;
   const { connection } = useConnection();
   const { adapter } = useActionSolanaWalletAdapter(connection.rpcEndpoint);
   const { action, isLoading } = useAction({url: actionApiUrl});
