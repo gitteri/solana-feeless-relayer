@@ -74,11 +74,12 @@ export class RpcService {
 
   /**
    * Get the SOL balance for a given public key
-   * @param {PublicKey} publicKey - The public key to check the balance for
+   * @param {string} publicKeyString - The public key to check the balance for
    * @returns {Promise<bigint>} The SOL balance as a bigint
    */
-  async getSolBalance(publicKey: PublicKey): Promise<bigint> {
+  async getSolBalance(publicKeyString: string): Promise<bigint> {
     try {
+      const publicKey = new PublicKey(publicKeyString);
       if (!validatePublicKey(publicKey)) {
         return BigInt(0);
       }
@@ -114,13 +115,15 @@ export class RpcService {
 
   /**
    * Get the SPL token balance for a given public key and mint
-   * @param {PublicKey} publicKey - The public key to check the balance for
-   * @param {PublicKey} mint - The SPL token mint
+   * @param {string} publicKeyString - The public key to check the balance for
+   * @param {string} mintString - The SPL token mint
    * @param {PublicKey} programId - The SPL token program ID (default: TOKEN_PROGRAM_ID)
    * @returns {Promise<string>} The SPL token balance as a string
    */
-  async getSplBalance(publicKey: PublicKey, mint: PublicKey, programId = TOKEN_PROGRAM_ID): Promise<string> {
-    const ata = getAssociatedTokenAddressSync(publicKey, mint, true, programId);
+  async getSplBalance(publicKeyString: string, mintString: string, programId = TOKEN_PROGRAM_ID): Promise<string> {
+    const publicKey = new PublicKey(publicKeyString);
+    const mint = new PublicKey(mintString);
+    const ata = getAssociatedTokenAddressSync(mint, publicKey, true, programId);
     try {
       if (!await this.hasTokenAccount(publicKey, mint, programId)) {
         return '0';

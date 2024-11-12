@@ -66,7 +66,7 @@ export default function RelayerDetailPage() {
             </div>
             <div>
               <h2 className="text-xl font-bold mb-2 text-gray-800 dark:text-gray-200">Amount</h2>
-              <p className="text-gray-700 dark:text-gray-300">{transfer.amount} {transfer.mintSymbol || ''}</p>
+              <p className="text-gray-700 dark:text-gray-300">{transfer.amount.toString()} {transfer.mintSymbol || ''}</p>
             </div>
             <div>
               <h2 className="text-xl font-bold mb-2 text-gray-800 dark:text-gray-200">Status</h2>
@@ -78,16 +78,16 @@ export default function RelayerDetailPage() {
             </div>
             <div>
               <h2 className="text-xl font-bold mb-2 text-gray-800 dark:text-gray-200">Fee in SPL</h2>
-              <p className="text-gray-700 dark:text-gray-300">{mint && transfer.feeInSpl ? (new Decimal(transfer.feeInSpl).mul(new Decimal(10).pow(-mint.decimals)).toFixed(mint.decimals)) : 'N/A'}</p>
+              <p className="text-gray-700 dark:text-gray-300">{mint && transfer.feeInSpl ? (new Decimal(transfer.feeInSpl.toString()).mul(new Decimal(10).pow(-mint.decimals)).toFixed(mint.decimals)) : 'N/A'}</p>
             </div>
             <div>
               <h2 className="text-xl font-bold mb-2 text-gray-800 dark:text-gray-200">Fee in SOL</h2>
-              <p className="text-gray-700 dark:text-gray-300">{transfer.feeInLamports ? (new Decimal(transfer.feeInLamports).div(LAMPORTS_PER_SOL).toFixed(8)) : 'N/A'}</p>
+              <p className="text-gray-700 dark:text-gray-300">{transfer.feeInLamports ? (new Decimal(transfer.feeInLamports.toString()).div(LAMPORTS_PER_SOL).toFixed(8)) : 'N/A'}</p>
             </div>
             {transfer.estimatedFeeInLamports && (
               <div>
                 <h2 className="text-xl font-bold mb-2 text-gray-800 dark:text-gray-200">Estimated Fee in SOL</h2>
-                <p className="text-gray-700 dark:text-gray-300">{new Decimal(transfer.estimatedFeeInLamports).div(LAMPORTS_PER_SOL).toFixed(8)}</p>
+                <p className="text-gray-700 dark:text-gray-300">{new Decimal(transfer.estimatedFeeInLamports.toString()).div(LAMPORTS_PER_SOL).toFixed(8)}</p>
               </div>
             )}
             {transfer.feePayer && (

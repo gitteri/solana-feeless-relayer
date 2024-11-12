@@ -18,15 +18,15 @@ model SplTransfer {
   referenceId              String?             @unique
   requestedByIp            String?
   signature                String?
-  amount                   String
+  amount                   Decimal
   mint                     String
   mintSymbol               String
   destination              String
   sender                   String
   feePayer                 String
-  estimatedFeeInLamports   String
-  feeInLamports            String
-  feeInSpl                 String?
+  estimatedFeeInLamports   BigInt
+  feeInLamports            BigInt
+  feeInSpl                 BigInt?
   unsignedTransactionBytes Bytes
   signedTransactionBytes   Bytes?
   slot                     Int?

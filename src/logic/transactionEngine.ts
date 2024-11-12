@@ -84,14 +84,14 @@ export async function createSplTransfer(sender: string, destination: string, amo
     referenceId: memoId,
     sender,
     destination,
-    amount,
+    amount: new Decimal(amount),
     mint: mint.address,
     mintSymbol,
     unsignedTransactionBytes: Buffer.from(splTransferTxn.serialize()),
     currentStatus: transactionStatuses.INIT,
     feePayer: relayWalletPublicKey,
-    feeInSpl: RELAY_FEE,
-    estimatedFeeInLamports: estimatedFeeInLamports.toString(),
+    feeInSpl: BigInt(RELAY_FEE),
+    estimatedFeeInLamports: estimatedFeeInLamports,
   };
 
   await createSplTransferInDb(splTransfer);

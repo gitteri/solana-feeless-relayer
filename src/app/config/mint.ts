@@ -10,7 +10,7 @@ export interface MintInfo {
 
 // TODO: move this to a config file and make it work for mainnet
 // these addresses are for devnet
-const supportedMints: Record<string, MintInfo> = {
+export const supportedMints: Record<string, MintInfo> = {
   'USDC': {
     address: '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU',
     decimals: 6,

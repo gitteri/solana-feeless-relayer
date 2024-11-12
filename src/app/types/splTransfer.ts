@@ -1,18 +1,20 @@
+import { Decimal } from 'decimal.js';
+
 
 export type SplTransfer = {
   id: string;
   signature?: string;
   referenceId?: string;
   requestedByIp?: string;
-  amount: string;
+  amount: Decimal;
   mint: string;
   mintSymbol: string;
   destination: string;
   sender: string;
   feePayer: string;
-  estimatedFeeInLamports?: string;
-  feeInLamports?: string;
-  feeInSpl?: string;
+  estimatedFeeInLamports?: bigint;
+  feeInLamports?: bigint;
+  feeInSpl?: bigint;
   unsignedTransactionBytes: Buffer;
   signedTransactionBytes?: Buffer;
   currentStatus: TransactionStatus;

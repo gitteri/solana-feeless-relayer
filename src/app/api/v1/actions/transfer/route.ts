@@ -65,7 +65,7 @@ export async function GET(req: NextRequest, res: NextResponse<ActionGetResponse 
   const payload: ActionGetResponse = {
     type: "action",
     title: "Token Transfer Without SOL",
-    icon: new URL("/logo.jpeg", requestUrl.origin).toString(),
+    icon: new URL("/relay.jpeg", requestUrl.origin).toString(),
     description: "Transfer a token to another Solana wallet without needing SOL in your wallet",
     label: "Transfer", // this value will be ignored since `links.actions` exists
     links: {

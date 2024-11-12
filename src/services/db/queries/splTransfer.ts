@@ -61,6 +61,7 @@ export const getSplTransferById = async (id: string): Promise<SplTransfer | null
     signedTransactionBytes: dbTransaction.signedTransactionBytes ?? undefined,
     feeInSpl: dbTransaction.feeInSpl ?? undefined,
     feePayer: dbTransaction.feePayer ?? undefined,
+    estimatedFeeInLamports: dbTransaction.estimatedFeeInLamports ?? undefined,
     signature: dbTransaction.signature ?? undefined,
     slot: dbTransaction.slot ?? undefined,
     timestampIncluded: dbTransaction.timestampIncluded ?? undefined,
@@ -91,10 +92,10 @@ export const createSplTransfer = async (data: SplTransfer) => {
       mintSymbol: data.mintSymbol,
       destination: data.destination ?? '',
       sender: data.sender ?? '',
-      feeInLamports: data.feeInLamports ?? '',
-      feeInSpl: data.feeInSpl ?? '',
+      feeInLamports: data.feeInLamports ?? 0,
+      feeInSpl: data.feeInSpl ?? 0,
       feePayer: data.feePayer ?? '',
-      estimatedFeeInLamports: data.estimatedFeeInLamports ?? '',
+      estimatedFeeInLamports: BigInt(data.estimatedFeeInLamports ?? 0),
       unsignedTransactionBytes: data.unsignedTransactionBytes ?? '',
       statuses: {
         create: [{

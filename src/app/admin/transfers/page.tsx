@@ -109,11 +109,11 @@ export default function RelayerPage() {
                   <tr key={transfer.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{ellipsify(transfer.sender)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{ellipsify(transfer.destination)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{transfer.amount} {transfer.mintSymbol}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{transfer.amount.toString()} {transfer.mintSymbol}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{transfer.currentStatus}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{transfer.createdAt ? new Date(transfer.createdAt).toLocaleString() : 'N/A'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                      <Link href={`relayer/${transfer.id}`} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-500">View Transaction</Link>
+                      <Link href={`/admin/transfers/${transfer.id}`} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-500">View Transaction</Link>
                     </td>
                   </tr>
                 ))}
