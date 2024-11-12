@@ -27,7 +27,7 @@ export async function updateTransferDetails(enrichedTransaction: EnrichedTransac
 
     // Construct the update payload
     const updatePayload = {
-      feeInLamports: fee.toString(),
+      feeInLamports: BigInt(fee),
       signature,
       slot,
       timestampIncluded: new Date(timestamp * 1000),
