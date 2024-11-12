@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { PublicSplTransfer } from '@/app/api/v1/transfer/[id]/route';
 import { Toaster } from 'react-hot-toast';
 import Link from 'next/link';
+import { PublicSplTransfer } from '@/app/api/v1/transfer/[id]/route';
 
 export default function RelayerPage() {
   const [transfers, setTransfers] = useState<PublicSplTransfer[]>([]);
@@ -36,13 +36,13 @@ export default function RelayerPage() {
     fetchTransfers(0, offset + limit);
     const interval = setInterval(() => fetchTransfers(0, offset + limit), 5000); // Refresh all data every 5 seconds
     return () => clearInterval(interval); // Cleanup interval on component unmount
-  }, []);
+  }, [fetchTransfers, offset, limit]);
 
   useEffect(() => {
     if (offset > 0) {
       fetchTransfers(offset);
     }
-  }, [offset]);
+  }, [fetchTransfers, offset]);
 
   const sortedTransfers = useMemo(() => {
     let sortableTransfers = [...transfers];

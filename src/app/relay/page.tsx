@@ -2,17 +2,17 @@
 
 import '@dialectlabs/blinks/index.css';
 
+import { useEffect, useState } from 'react';
+import { useConnection } from '@solana/wallet-adapter-react';
 import { Blink, useAction } from "@dialectlabs/blinks";
 import { useActionSolanaWalletAdapter } from "@dialectlabs/blinks/hooks/solana"
-import { useConnection } from '@solana/wallet-adapter-react';
-import { useEffect, useState } from 'react';
 
 // needs to be wrapped with <WalletProvider /> and <WalletModalProvider />
 export default function Relay() {
-  const actionApiUrl = `${window.location.origin}/api/v1/actions/transfer`;
+  const actionApiUrl = typeof window !== 'undefined' ? `${window.location.origin}/api/v1/actions/transfer` : '';
   const { connection } = useConnection();
   const { adapter } = useActionSolanaWalletAdapter(connection.rpcEndpoint);
-  const { action, isLoading } = useAction({url: actionApiUrl});
+  const { action, isLoading } = useAction({ url: actionApiUrl });
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {

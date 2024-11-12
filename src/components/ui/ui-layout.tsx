@@ -1,14 +1,13 @@
 'use client'
 
+import { ReactNode, Suspense, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import {usePathname} from 'next/navigation'
-import * as React from 'react'
-import {ReactNode, Suspense, useEffect, useRef} from 'react'
-import toast, {Toaster} from 'react-hot-toast'
-
-import {AccountChecker} from '../account/account-ui'
-import {ClusterChecker, ClusterUiSelect, ExplorerLink} from '../cluster/cluster-ui'
-import {WalletButton} from '../solana/solana-provider'
+import { usePathname } from 'next/navigation'
+import Image from 'next/image'
+import toast, { Toaster } from 'react-hot-toast'
+import { AccountChecker } from '../account/account-ui'
+import { ClusterChecker, ClusterUiSelect, ExplorerLink } from '../cluster/cluster-ui'
+import { WalletButton } from '../solana/solana-provider'
 
 export function UiLayout({ children, links }: { children: ReactNode; links: { label: string; path: string }[] }) {
   const pathname = usePathname()
@@ -18,7 +17,7 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
       <div className="navbar bg-base-200 text-neutral-content flex-col md:flex-row space-y-2 md:space-y-0 shadow-lg">
         <div className="flex-1">
           <Link className="btn btn-ghost normal-case text-xl text-primary" href="/">
-            <img className="h-4 md:h-6" alt="Logo" src="/logo.jpeg" />
+            <Image className="h-4 md:h-6" alt="Logo" src="/logo.jpeg" width={24} height={24} />
           </Link>
           <ul className="menu menu-horizontal px-1 space-x-2">
             {links.map(({ label, path }) => (

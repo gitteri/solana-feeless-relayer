@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Decimal from 'decimal.js';
+import { Toaster, toast } from 'react-hot-toast';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { PublicSplTransfer } from '@/app/api/v1/transfer/[id]/route';
 import { ExplorerLink } from '@/components/cluster/cluster-ui';
-import { Toaster, toast } from 'react-hot-toast';
 import { ellipsify } from '@/components/ui/ui-layout';
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { getMintInfo } from '@/app/config/mint';
 
 export default function RelayerDetailPage() {
@@ -35,7 +35,7 @@ export default function RelayerDetailPage() {
       const interval = setInterval(fetchTransfer, 3000); // Refresh every 3 seconds
       return () => clearInterval(interval); // Cleanup interval on component unmount
     }
-  }, [id]);
+  }, [fetchTransfer, id]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
