@@ -1,10 +1,10 @@
-import { PublicKey } from '@solana/web3.js';
+import { Keypair, PublicKey } from '@solana/web3.js';
 import { RpcService } from './rpcService';
 
 describe('RpcService', () => {
   let rpcService: RpcService;
-  const USDC_MINT = new PublicKey('11111111111111111111111111111111'); // Replace with actual USDC mint public key
-  const DUMMY_PUBLIC_KEY = new PublicKey('11111111111111111111111111111111');
+  const USDC_MINT = '11111111111111111111111111111111'; // Replace with actual USDC mint public key
+  const DUMMY_PUBLIC_KEY = '11111111111111111111111111111111';
 
   beforeAll(() => {
     rpcService = new RpcService();
@@ -21,7 +21,7 @@ describe('RpcService', () => {
         data: Buffer.from([]),
         executable: false,
         lamports: 0,
-        owner: DUMMY_PUBLIC_KEY,
+        owner: new PublicKey(DUMMY_PUBLIC_KEY),
         rentEpoch: 0,
       });
       jest.spyOn(rpcService.connection, 'getTokenAccountBalance').mockResolvedValue({
@@ -44,7 +44,7 @@ describe('RpcService', () => {
         data: Buffer.from([]),
         executable: false,
         lamports: 0,
-        owner: DUMMY_PUBLIC_KEY,
+        owner: new PublicKey(DUMMY_PUBLIC_KEY),
         rentEpoch: 0,
       });
       jest.spyOn(rpcService.connection, 'getTokenAccountBalance').mockResolvedValue({
@@ -67,7 +67,7 @@ describe('RpcService', () => {
         data: Buffer.from([]),
         executable: false,
         lamports: 0,
-        owner: DUMMY_PUBLIC_KEY,
+        owner: new PublicKey(DUMMY_PUBLIC_KEY),
         rentEpoch: 0,
       });
       jest.spyOn(rpcService.connection, 'getTokenAccountBalance').mockRejectedValue(new Error('RPC error'));
@@ -77,8 +77,9 @@ describe('RpcService', () => {
 
     it('should return the real SPL token balance for a given public key and mint using the real RPC server', async () => {
       if (process.env.NODE_PROCESS !== 'ci') {
-        const REAL_PUBLIC_KEY = new PublicKey('Aw9KGfJLxLxPV6fZVN4RejAcgZoo6QaTioxSCQjppz9q'); // never used
-        const REAL_USDC_MINT = new PublicKey('4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU'); // Devnet
+        const keypair = Keypair.generate();
+        const REAL_PUBLIC_KEY = keypair.publicKey.toBase58();
+        const REAL_USDC_MINT = '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU'; // Devnet
 
         const balance = await rpcService.getSplBalance(REAL_PUBLIC_KEY, REAL_USDC_MINT);
         console.log('Debug: real SPL token balance:', balance);
