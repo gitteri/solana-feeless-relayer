@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validate } from 'uuid';
 import { getSplTransfer } from '@/logic/transactionEngine';
-import { PublicSplTransfer, splTransferToPublicSplTransfer } from '@/app/api/v1/transfer/route';
+import { PublicSplTransfer, splTransferToPublicSplTransfer } from '../publicSplTransfer';
 
 const validateGetSplTransferRequest = (id?: any): { error: string } | null => {
   if (!id) {
