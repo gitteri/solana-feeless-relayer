@@ -32,10 +32,13 @@ export default function RelayerDetailPage() {
   useEffect(() => {
     if (id) {
       fetchTransfer();
-      const interval = setInterval(fetchTransfer, 3000); // Refresh every 3 seconds
+      const interval = setInterval(() => {
+        setLoading(true);
+        fetchTransfer();
+      }, 3000); // Refresh every 3 seconds
       return () => clearInterval(interval); // Cleanup interval on component unmount
     }
-  }, [fetchTransfer, id]);
+  }, [id]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
