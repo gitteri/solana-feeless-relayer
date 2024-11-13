@@ -32,10 +32,7 @@ export default function RelayerDetailPage() {
   useEffect(() => {
     if (id) {
       fetchTransfer();
-      const interval = setInterval(() => {
-        setLoading(true);
-        fetchTransfer();
-      }, 3000); // Refresh every 3 seconds
+      const interval = setInterval(fetchTransfer, 3000); // Refresh every 3 seconds
       return () => clearInterval(interval); // Cleanup interval on component unmount
     }
   }, [id]);
@@ -48,7 +45,7 @@ export default function RelayerDetailPage() {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-4xl font-extrabold text-center mb-8 text-gray-800 dark:text-gray-200">SPL Transfer Details</h1>
-      {loading ? (
+      {loading && !transfer ? (
         <div className="flex justify-center items-center h-64">
           <span className="loading loading-spinner loading-lg"></span>
         </div>
