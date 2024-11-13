@@ -37,8 +37,8 @@ export default function AdminPage() {
     {
       token: 'USDC',
       balance: '0',
-    }, 
-  {
+    },
+    {
       token: 'PYUSD',
       balance: '0',
     }],
@@ -60,14 +60,16 @@ export default function AdminPage() {
     <div>
       <AppHero title="Admin Dashboard" subtitle="Overview of relayer activity and statistics" />
       <div className="p-4">
-        <div className="card">
-          <div className="card-body">
-            <h2 className="card-title">Relayer Account Balances</h2>
-            {relayerData.accountBalances.map((balance) => (
-              <p key={balance.token}>{balance.token}: {balance.balance}</p>
-            ))}
+        {relayerData.accountBalances.length > 0 && (
+          <div className="card">
+            <div className="card-body">
+              <h2 className="card-title">Relayer Account Balances</h2>
+              {relayerData.accountBalances.map((balance) => (
+                <p key={balance.token}>{balance.token}: {balance.balance}</p>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         <div className="card mt-4">
           <div className="card-body">
             <h2 className="card-title">Relayer Activity Statistics</h2>
