@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Toaster } from 'react-hot-toast';
-import { PublicSplTransfer } from '@/app/api/v1/transfer/[id]/route';
+import { PublicSplTransfer } from '@/app/api/v1/transfer/publicSplTransfer';
 
 export default function RelayerPage() {
   const [transfers, setTransfers] = useState<PublicSplTransfer[]>([]);

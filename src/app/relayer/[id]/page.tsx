@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Decimal from 'decimal.js';
 import { Toaster, toast } from 'react-hot-toast';
-import { PublicSplTransfer } from '@/app/api/v1/transfer/[id]/route';
+import { PublicSplTransfer } from '@/app/api/v1/transfer/publicSplTransfer';
 import { ExplorerLink } from '@/components/cluster/cluster-ui';
 import { ellipsify } from '@/components/ui/ui-layout';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
