@@ -36,13 +36,13 @@ export default function RelayerPage() {
     fetchTransfers(0, offset + limit);
     const interval = setInterval(() => fetchTransfers(0, offset + limit), 5000); // Refresh all data every 5 seconds
     return () => clearInterval(interval); // Cleanup interval on component unmount
-  }, [fetchTransfers, offset, limit]);
+  }, [offset, limit]);
 
   useEffect(() => {
     if (offset > 0) {
       fetchTransfers(offset);
     }
-  }, [fetchTransfers, offset]);
+  }, [offset]);
 
   const sortedTransfers = useMemo(() => {
     let sortableTransfers = [...transfers];
